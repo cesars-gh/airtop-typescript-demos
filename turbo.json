@@ -1,7 +1,9 @@
 {
   "$schema": "https://turbo.build/schema.json",
-  "ui": "tui",
   "tasks": {
+    "build:dev": {
+      "cache": false
+    },
     "build": {
       "dependsOn": ["^build"],
       "inputs": ["$TURBO_DEFAULT$", ".env*"],
@@ -11,6 +13,7 @@
       "dependsOn": ["^lint"]
     },
     "dev": {
+      "dependsOn": ["build:dev"],
       "cache": false,
       "persistent": true
     }
