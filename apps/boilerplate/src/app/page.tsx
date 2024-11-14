@@ -1,18 +1,18 @@
+import { StartForm } from "@/components/forms/StartForm";
 import { Card, CardContent, CardHeader, CardTitle, PageHeader } from "@local/ui";
 
 export default function MainPage() {
   return (
     <>
       <div className="flex-col">
-        <PageHeader title="Sample Application" />
+        <PageHeader title="Linkedin Scraper" description="Scrapes data from a user's LinkedIn page." />
       </div>
       <Card>
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-          <CardTitle className="text-sm font-medium">Sales</CardTitle>
+          <CardTitle className="text-sm font-medium">Inputs</CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="text-2xl font-bold">+12,234</div>
-          <p className="text-xs text-muted-foreground">+19% from last month</p>
+          <StartForm />
         </CardContent>
       </Card>
     </>

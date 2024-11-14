@@ -1,5 +1,5 @@
 {
-  "include": ["src/**/*", "package.json", "tailwind.config.js"],
+  "include": ["src/**/*", "package.json", "tailwind.config.ts", "components.json", "tsconfig.json"],
   "execOnChange": "pnpm run build",
   "hashFile": ".hashes.json"
 }
