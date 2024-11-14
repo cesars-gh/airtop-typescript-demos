@@ -3,9 +3,7 @@ import { Inter } from "next/font/google";
 import type { PropsWithChildren } from "react";
 
 import "./globals.css";
-import { ThemeProvider } from "@/components/common/ThemeProvider";
-import { fontMono, fontSans } from "@/lib/fonts";
-import { cn } from "@/lib/utils";
+import { Body } from "@local/ui";
 
 const inter = Inter({ subsets: ["latin"], display: "swap" });
 
@@ -24,15 +22,7 @@ export default async function RootLayout({ children }: PropsWithChildren) {
           type="text/css"
         />
       </head>
-      <body
-        className={cn("min-h-screen bg-background font-sans antialiased mx-12", fontSans.variable, fontMono.variable)}
-      >
-        <ThemeProvider attribute="class" defaultTheme="dark" enableSystem disableTransitionOnChange enableColorScheme>
-          <div>
-            <div className="relative flex min-h-screen flex-col bg-background">{children}</div>
-          </div>
-        </ThemeProvider>
-      </body>
+      <Body>{children}</Body>
     </html>
   );
 }

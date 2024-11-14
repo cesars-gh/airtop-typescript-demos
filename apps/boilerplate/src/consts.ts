@@ -1,3 +1,6 @@
+import { z } from "zod";
+import { zodToJsonSchema } from "zod-to-json-schema";
+
 export const LOGIN_URL = "https://www.linkedin.com/login";
 
 export const IS_LOGGED_IN_PROMPT =
@@ -25,47 +28,42 @@ Job Information: Include all past and present job titles, company names, dates o
 Education Information: Gather the school names, degrees obtained, field of study, dates attended, and any listed honors or activities.
 Mutual Connections: List mutual connections by their names, current job titles, and the company they work for.`;
 
-export const EXTRACT_DATA_OUTPUT_SCHEMA = {
-  $schema: "http://json-schema.org/draft-07/schema#",
-  type: "object",
-  properties: {
-    profile_url: "string",
-    personal_info: {
-      name: "string",
-      headline: "string",
-      location: "string",
-    },
-    job_history: [
-      {
-        title: "string",
-        company: "string",
-        location: "string",
-        start_date: "string (YYYY-MM)",
-        end_date: "string (YYYY-MM) or 'Present'",
-        description: "string",
-      },
-    ],
-    education: [
-      {
-        school: "string",
-        degree: "string",
-        field_of_study: "string",
-        start_date: "string (YYYY-MM)",
-        end_date: "string (YYYY-MM)",
-        honors: ["array of strings"],
-        activities: ["array of strings"],
-      },
-    ],
-    mutual_connections: [
-      {
-        name: "string",
-        title: "string",
-        company: "string",
-      },
-    ],
-    error: {
-      type: "string",
-      description: "If you cannot fulfill the request, use this field to report the problem.",
-    },
-  },
-};
+const OUTPUT_SCHEMA = z.object({
+  profile_url: z.string(),
+  personal_info: z.object({
+    name: z.string(),
+    headline: z.string(),
+    location: z.string(),
+  }),
+  job_history: z.array(
+    z.object({
+      title: z.string(),
+      company: z.string(),
+      location: z.string(),
+      start_date: z.string().describe("In YYYY-MM format"),
+      end_date: z.string().describe("In YYYY-MM format or 'Present'"),
+      description: z.string(),
+    }),
+  ),
+  education: z.array(
+    z.object({
+      school: z.string(),
+      degree: z.string(),
+      field_of_study: z.string(),
+      start_date: z.string().describe("In YYYY-MM format"),
+      end_date: z.string().describe("In YYYY-MM format"),
+      honors: z.array(z.string()),
+      activities: z.array(z.string()),
+    }),
+  ),
+  mutual_connections: z.array(
+    z.object({
+      name: z.string(),
+      title: z.string(),
+      company: z.string(),
+    }),
+  ),
+  error: z.string().optional().describe("If you cannot fulfill the request, use this field to report the problem"),
+});
+
+export const EXTRACT_DATA_OUTPUT_SCHEMA = zodToJsonSchema(OUTPUT_SCHEMA);

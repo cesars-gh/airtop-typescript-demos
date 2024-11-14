@@ -15,6 +15,7 @@ export async function startController({ apiKey, profileId, log }: StartControlle
     apiKey,
   });
 
+  log.info("Creating a new session");
   const createSessionResponse = await client.sessions.create({
     configuration: {
       timeoutMinutes: 10,
@@ -24,7 +25,7 @@ export async function startController({ apiKey, profileId, log }: StartControlle
   });
 
   const session = createSessionResponse.data;
-  log.info("Created airtop session", session.id);
+  log.info("Created session", session.id);
 
   if (!createSessionResponse.data.cdpWsUrl) {
     throw new Error("Unable to get cdp url");

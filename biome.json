@@ -11,13 +11,14 @@
   },
   "linter": {
     "enabled": true,
-    "ignore": ["dist/*", "node_modules/*"],
+    "ignore": ["dist/*", "node_modules/*", "packages/ui/src/components/ui/*"],
     "rules": {
       "performance": {
         "noDelete": "off"
       },
       "complexity": {
-        "useLiteralKeys": "off"
+        "useLiteralKeys": "off",
+        "noForEach": "off"
       },
       "correctness": {
         "noUnusedImports": "error"

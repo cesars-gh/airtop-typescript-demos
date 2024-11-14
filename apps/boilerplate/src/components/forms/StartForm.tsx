@@ -1,6 +1,7 @@
 "use client";
 
-import { type StartRequest, startRequestSchema } from "@/app/api/start/start.validation";
+import { type StartRequest, type StartResponse, startRequestSchema } from "@/app/api/start/start.validation";
+import { useAppStore } from "@/store";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
   Button,
@@ -12,18 +13,37 @@ import {
   FormLabel,
   FormMessage,
   Input,
-  toFormFieldLabel,
 } from "@local/ui";
 import type React from "react";
 import { useCallback } from "react";
 import { useForm } from "react-hook-form";
 
 export function StartForm() {
+  const setStartResponse = useAppStore((state) => state.setStartResponse);
+  const setApiKey = useAppStore((state) => state.setApiKey);
+
   const form = useForm<StartRequest>({
     resolver: zodResolver(startRequestSchema),
+    defaultValues: {
+      apiKey: "",
+      profileId: "",
+    },
   });
 
-  const onSubmit = useCallback(async (data: StartRequest) => {}, []);
+  const onSubmit = useCallback(
+    async (data: StartRequest) => {
+      setApiKey(data.apiKey);
+
+      const response = await fetch("/api/start", {
+        method: "POST",
+        body: JSON.stringify(data),
+      });
+
+      const result = (await response.json()) as StartResponse;
+      setStartResponse(result);
+    },
+    [setStartResponse, setApiKey],
+  );
 
   const handleFormSubmit = useCallback(
     (event: React.FormEvent<HTMLFormElement>) => {
@@ -36,24 +56,37 @@ export function StartForm() {
   return (
     <Form {...form}>
       <form onSubmit={handleFormSubmit} className="space-y-6">
-        {Object.entries(startRequestSchema.shape).map(([fieldName, fieldSchema]) => (
-          <FormField
-            key={fieldName}
-            control={form.control}
-            name={fieldName as keyof StartRequest}
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>{toFormFieldLabel(fieldName)}</FormLabel>
-                <FormControl>
-                  <Input {...field} />
-                </FormControl>
-                <FormDescription>{fieldSchema.description}</FormDescription>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-        ))}
-        <Button type="submit">Start</Button>
+        <FormField
+          name="apiKey"
+          control={form.control}
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>API Key</FormLabel>
+              <FormControl>
+                <Input {...field} />
+              </FormControl>
+              <FormDescription>{startRequestSchema.shape.apiKey.description}</FormDescription>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <FormField
+          name="profileId"
+          control={form.control}
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Profile ID</FormLabel>
+              <FormControl>
+                <Input {...field} />
+              </FormControl>
+              <FormDescription>{startRequestSchema.shape.profileId.description}</FormDescription>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <Button type="submit" disabled={form.formState.isSubmitting}>
+          Start
+        </Button>
       </form>
     </Form>
   );
