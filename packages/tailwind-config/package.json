@@ -1,9 +1,9 @@
 {
   "name": "@local/tailwind-config",
-  "private": true,
-  "version": "1.0.0",
   "description": "Tailwind configuration for airtop demos",
+  "version": "1.0.0",
   "type": "module",
+  "private": true,
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
@@ -15,14 +15,14 @@
     "build:dev": "hash-runner",
     "build": "rm -rf dist && tsc"
   },
-  "license": "MIT",
   "dependencies": {
-    "tailwindcss": "3.4.14",
+    "tailwindcss": "3.4.15",
     "tailwindcss-animate": "1.0.7"
   },
   "devDependencies": {
     "@local/typescript-config": "workspace:*",
     "hash-runner": "2.0.1",
     "typescript": "5.6.3"
-  }
+  },
+  "license": "MIT"
 }
