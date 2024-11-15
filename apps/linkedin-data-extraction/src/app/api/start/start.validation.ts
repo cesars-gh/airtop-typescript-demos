@@ -1,7 +1,7 @@
 import { z } from "zod";
 
 export const startRequestSchema = z.object({
-  apiKey: z.string().describe("The API key to use for the request"),
+  apiKey: z.string().min(59).describe("The API key to use for the request"),
   profileId: z.string().optional().describe("(optional) The profile ID to use for the session"),
 });
 

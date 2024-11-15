@@ -1,5 +1,5 @@
 import type { StartResponse } from "@/app/api/start/start.validation";
-import { ScraperService } from "@/scraper.service";
+import { LinkedInExtractorService } from "@/lib/linkedin-extractor.service";
 import chalk from "chalk";
 import type { LogLayer } from "loglayer";
 
@@ -10,7 +10,7 @@ interface StartControllerParams {
 }
 
 export async function startController({ apiKey, profileId, log }: StartControllerParams): Promise<StartResponse> {
-  const service = new ScraperService({ apiKey, log });
+  const service = new LinkedInExtractorService({ apiKey, log });
 
   const { session, windowInfo } = await service.initializeSessionAndBrowser(profileId);
 

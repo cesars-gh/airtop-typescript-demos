@@ -1,0 +1,36 @@
+{
+  "name": "@local/utils",
+  "version": "1.0.0",
+  "description": "Common utilities for Airtop demos",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js"
+    }
+  },
+  "scripts": {
+    "build:dev": "hash-runner",
+    "build": "pnpm run lint && rm -rf dist && tsc && tsc-alias",
+    "lint": "biome check --write --unsafe src && biome format src --write && biome lint src --fix"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "loglayer": "4.8.0"
+  },
+  "optionalDependencies": {
+    "zod": "3.23.8",
+    "@airtop/sdk": "0.1.5"
+  },
+  "devDependencies": {
+    "zod": "3.23.8",
+    "@airtop/sdk": "0.1.5",
+    "@local/typescript-config": "workspace:*",
+    "@types/node": "22.9.0",
+    "hash-runner": "2.0.1",
+    "tsc-alias": "1.8.10",
+    "typescript": "5.6.3"
+  }
+}

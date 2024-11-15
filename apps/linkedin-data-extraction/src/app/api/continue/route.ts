@@ -4,14 +4,14 @@ import {
   type ContinueResponse,
   continueRequestSchema,
 } from "@/app/api/continue/continue.validation";
-import { logger } from "@/lib/logging";
+import { getLogger } from "@local/utils";
 import { type NextRequest, NextResponse } from "next/server";
 
 /**
  * Continues the process of extracting data from LinkedIn after the user has completed sign-in.
  */
 export async function POST(request: NextRequest): Promise<NextResponse<ContinueResponse>> {
-  const log = logger.withPrefix("[api/continue]");
+  const log = getLogger().withPrefix("[api/continue]");
 
   const data = (await request.json()) as ContinueRequest;
 

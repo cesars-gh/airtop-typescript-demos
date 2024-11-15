@@ -11,14 +11,14 @@ import chalk from "chalk";
 import type { LogLayer } from "loglayer";
 
 /**
- * Service for scraping LinkedIn data using the Airtop client.
+ * Service for extracting LinkedIn data using the Airtop client.
  */
-export class ScraperService {
+export class LinkedInExtractorService {
   client: AirtopClient;
   log: LogLayer;
 
   /**
-   * Creates a new instance of ScraperService.
+   * Creates a new instance of LinkedInExtractorService.
    * @param {Object} params - Configuration parameters
    * @param {string} params.apiKey - API key for Airtop client authentication
    * @param {LogLayer} params.log - Logger instance for service operations

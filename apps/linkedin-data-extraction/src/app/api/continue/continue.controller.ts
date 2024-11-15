@@ -1,5 +1,5 @@
 import type { ContinueResponse } from "@/app/api/continue/continue.validation";
-import { ScraperService } from "@/scraper.service";
+import { LinkedInExtractorService } from "@/lib/linkedin-extractor.service";
 import type { LogLayer } from "loglayer";
 
 interface ContinueControllerParams {
@@ -15,7 +15,7 @@ export async function continueController({
   sessionId,
   windowId,
 }: ContinueControllerParams): Promise<ContinueResponse> {
-  const service = new ScraperService({ apiKey, log });
+  const service = new LinkedInExtractorService({ apiKey, log });
 
   const content = await service.extractLinkedInData({
     sessionId,

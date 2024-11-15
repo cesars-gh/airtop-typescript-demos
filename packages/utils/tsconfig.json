@@ -1,0 +1,12 @@
+{
+  "extends": "@local/typescript-config/base.json",
+  "compilerOptions": {
+    "noImplicitAny": false,
+    "outDir": "dist",
+    "jsx": "preserve",
+    "paths": {
+      "@/*": ["./src/*"]
+    }
+  },
+  "include": ["src/**/*"]
+}

@@ -1,8 +1,12 @@
 import { LogLayer, LoggerType } from "loglayer";
 
-export const logger = new LogLayer({
+const logger = new LogLayer({
   logger: {
     instance: console,
     type: LoggerType.CONSOLE,
   },
 });
+
+export function getLogger(): LogLayer {
+  return logger;
+}

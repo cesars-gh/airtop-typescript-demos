@@ -5,6 +5,7 @@ import { useAppStore } from "@/store";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
   Button,
+  ElapsedTime,
   Form,
   FormControl,
   FormDescription,
@@ -13,6 +14,7 @@ import {
   FormLabel,
   FormMessage,
   Input,
+  useHandleError,
 } from "@local/ui";
 import type React from "react";
 import { useCallback } from "react";
@@ -21,6 +23,7 @@ import { useForm } from "react-hook-form";
 export function StartForm() {
   const setStartResponse = useAppStore((state) => state.setStartResponse);
   const setApiKey = useAppStore((state) => state.setApiKey);
+  const handleError = useHandleError();
 
   const form = useForm<StartRequest>({
     resolver: zodResolver(startRequestSchema),
@@ -34,15 +37,27 @@ export function StartForm() {
     async (data: StartRequest) => {
       setApiKey(data.apiKey);
 
-      const response = await fetch("/api/start", {
-        method: "POST",
-        body: JSON.stringify(data),
-      });
+      try {
+        const response = await fetch("/api/start", {
+          method: "POST",
+          body: JSON.stringify(data),
+        });
 
-      const result = (await response.json()) as StartResponse;
-      setStartResponse(result);
+        if (!response.ok) {
+          const errorData = await response.json();
+          throw errorData;
+        }
+
+        const result = (await response.json()) as StartResponse;
+        setStartResponse(result);
+      } catch (e: any) {
+        handleError({
+          error: e,
+          consoleLogMessage: "API call failed",
+        });
+      }
     },
-    [setStartResponse, setApiKey],
+    [setStartResponse, setApiKey, handleError],
   );
 
   const handleFormSubmit = useCallback(
@@ -85,7 +100,7 @@ export function StartForm() {
           )}
         />
         <Button type="submit" disabled={form.formState.isSubmitting}>
-          Start
+          {form.formState.isSubmitting ? <ElapsedTime content="Working..." /> : "Start"}
         </Button>
       </form>
     </Form>
