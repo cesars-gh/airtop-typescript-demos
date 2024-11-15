@@ -7,7 +7,6 @@ import {
   TARGET_URL,
 } from "@/consts";
 import { AirtopClient } from "@airtop/sdk";
-import chalk from "chalk";
 import type { LogLayer } from "loglayer";
 
 /**
@@ -86,7 +85,7 @@ export class LinkedInExtractorService {
       },
     });
 
-    this.log.info("Parsing response to if the use is logged in");
+    this.log.info("Parsing response to if the user is logged in");
     const parsedResponse = JSON.parse(isLoggedInPromptResponse.data.modelResponse);
 
     if (parsedResponse.error) {
@@ -121,8 +120,9 @@ export class LinkedInExtractorService {
       },
     });
 
+    this.log.info("Got response from AI agent, formatting JSON");
+
     const formattedJson = JSON.stringify(JSON.parse(promptContentResponse.data.modelResponse), null, 2);
-    this.log.info("Response:\n\n", chalk.green(formattedJson));
 
     this.log.info("Closing window and terminating session");
 
