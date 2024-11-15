@@ -1,4 +1,3 @@
-import { continueController } from "@/app/api/continue/continue.controller";
 import { startController } from "@/app/api/start/start.controller";
 import { type StartRequest, type StartResponse, startRequestSchema } from "@/app/api/start/start.validation";
 import { logger } from "@/lib/logging";
@@ -19,22 +18,5 @@ export async function POST(request: NextRequest): Promise<NextResponse<StartResp
 
   const controllerResponse = await startController({ log, ...data });
 
-  // A sign in is required, we'll return early with the live view URL
-  // so the user can sign in
-  if (controllerResponse.signInRequired) {
-    return NextResponse.json<StartResponse>(controllerResponse);
-  }
-
-  // Continue with the process of extracting data
-  const continueResponse = await continueController({
-    apiKey: data.apiKey,
-    sessionId: controllerResponse.sessionId as string,
-    windowId: controllerResponse.windowId as string,
-    log,
-  });
-
-  return NextResponse.json<StartResponse>({
-    signInRequired: false,
-    ...continueResponse,
-  });
+  return NextResponse.json<StartResponse>(controllerResponse);
 }

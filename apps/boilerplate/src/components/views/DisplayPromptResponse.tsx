@@ -11,7 +11,7 @@ export function DisplayPromptResponse({ content }: DisplayPromptResponseProps) {
         <CardTitle className="text-sm font-medium">Scraped Data</CardTitle>
       </CardHeader>
       <CardContent>
-        <pre>{content}</pre>
+        <pre className="overflow-auto">{content}</pre>
       </CardContent>
     </Card>
   );
