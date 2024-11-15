@@ -80,7 +80,12 @@ export function StartForm() {
               <FormControl>
                 <Input {...field} />
               </FormControl>
-              <FormDescription>{startRequestSchema.shape.apiKey.description}</FormDescription>
+              <FormDescription>
+                {startRequestSchema.shape.apiKey.description}.{" "}
+                <a className="text-white" target="_blank" href="https://portal.airtop.ai/api-keys" rel="noreferrer">
+                  Get one here.
+                </a>
+              </FormDescription>
               <FormMessage />
             </FormItem>
           )}

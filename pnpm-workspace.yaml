@@ -1,5 +1,5 @@
 packages:
   # executable/launchable applications
-  - "apps/*"
+  - "examples/*"
   # re-usable libraries across applications
   - "packages/*"

@@ -3,6 +3,9 @@ import { confirm, input } from "@inquirer/prompts";
 import { getLogger } from "@local/utils";
 import chalk from "chalk";
 
+/**
+ * Command line example that uses Airtop to extract data from LinkedIn.
+ */
 async function cli() {
   const log = getLogger();
 
