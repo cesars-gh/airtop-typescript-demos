@@ -12,15 +12,6 @@ app routing and a CLI tool that demonstrates how to extract data from LinkedIn u
   * In the web application, it will render an iframe with the LiveView URL for the user to sign-in
 - Once the user is signed-in, the code will extract the user's LinkedIn profile data and print it
 
-## Tools used
-
-- [`Next.js`](https://nextjs.org/)
-- [`shadcn/ui`](https://ui.shadcn.com/) for UI components
-- [`zustand`](https://github.com/pmndrs/zustand) for client-side state management
-- [`zod`](https://zod.dev/) for input validation
-- [`React Hook Form`](https://react-hook-form.com/) for forms
-- [`Loglayer`](https://github.com/theogravity/loglayer) for logging (backed using `console.log`)
-
 ## Code
 
 The Airtop code used by the web application and CLI is located in `src/lib/linkedin-extractor.service.ts` as a class
