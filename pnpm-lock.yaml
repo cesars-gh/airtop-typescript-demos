@@ -165,6 +165,9 @@ importers:
       '@hookform/resolvers':
         specifier: 3.9.1
         version: 3.9.1(react-hook-form@7.53.2(react@19.0.0-rc-66855b96-20241106))
+      '@local/utils':
+        specifier: workspace:*
+        version: link:../utils
       '@radix-ui/react-label':
         specifier: 2.1.0
         version: 2.1.0(@types/react-dom@18.3.1)(@types/react@18.3.12)(react-dom@19.0.0-rc-66855b96-20241106(react@19.0.0-rc-66855b96-20241106))(react@19.0.0-rc-66855b96-20241106)
@@ -223,9 +226,6 @@ importers:
       '@local/typescript-config':
         specifier: workspace:*
         version: link:../typescript-config
-      '@local/utils':
-        specifier: workspace:*
-        version: link:../utils
       '@types/node':
         specifier: 22.9.0
         version: 22.9.0

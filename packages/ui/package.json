@@ -16,6 +16,7 @@
     "verify-types": "tsc --project tsconfig.json --noEmit"
   },
   "dependencies": {
+    "@local/utils": "workspace:*",
     "@hookform/resolvers": "3.9.1",
     "@radix-ui/react-label": "2.1.0",
     "@radix-ui/react-slot": "1.1.0",
@@ -35,7 +36,6 @@
   "devDependencies": {
     "@local/tailwind-config": "workspace:*",
     "@local/typescript-config": "workspace:*",
-    "@local/utils": "workspace:*",
     "@types/node": "22.9.0",
     "@types/react": "18.3.12",
     "@types/react-dom": "18.3.1",
