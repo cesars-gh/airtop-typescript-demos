@@ -14,6 +14,7 @@
       "inputs": ["packages/**"],
       "outputs": ["packages/**/dist/**"]
     },
+    "verify-types": {},
     "lint": {
       "dependsOn": ["^lint"]
     },

@@ -1,5 +1,6 @@
 {
-  "name": "demos",
+  "name": "airtop-examples",
+  "version": "0.0.0",
   "private": true,
   "scripts": {
     "build": "turbo build",
@@ -16,7 +17,8 @@
     "release": "changeset publish",
     "version-packages": "changeset version",
     "prepare": "husky",
-    "publish-packages": "turbo run build && changeset version && changeset publish"
+    "publish-packages": "turbo run build && changeset version && changeset publish",
+    "verify-types": "turbo run verify-types --continue --"
   },
   "devDependencies": {
     "@biomejs/biome": "1.9.4",
@@ -38,16 +40,12 @@
   "lint-staged": {
     "**/*.{js,jsx,ts,tsx,html,css,json}": [
       "pnpm run lint",
-      "pnpm run typecheck"
+      "pnpm run verify-types"
     ],
     "**/package.json": [
       "pnpm run syncpack:format",
       "pnpm run syncpack:lint"
     ]
   },
-  "packageManager": "pnpm@9.6.0",
-  "workspaces": [
-    "apps/*",
-    "packages/*"
-  ]
+  "packageManager": "pnpm@9.6.0"
 }
