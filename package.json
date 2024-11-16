@@ -8,6 +8,7 @@
     "lint": "turbo run lint --continue --",
     "changeset": "changeset",
     "changeset:add": "changeset add",
+    "lint-staged": "lint-staged",
     "lint:packages": "pnpm run lint:packages:semver && pnpm run lint:packages:mismatches",
     "lint:packages:semver": "syncpack lint-semver-ranges",
     "lint:packages:mismatches": "syncpack list-mismatches",
@@ -38,8 +39,10 @@
     "node": ">=20"
   },
   "lint-staged": {
-    "**/*.{js,jsx,ts,tsx,html,css,json}": [
-      "pnpm run lint",
+    "**/*.{js,jsx,ts,tsx,json}": [
+      "pnpm run lint"
+    ],
+    "**/*.{js,jsx,ts,tsx}": [
       "pnpm run verify-types"
     ],
     "**/package.json": [
