@@ -13,6 +13,9 @@
     "enabled": true,
     "ignore": ["dist/*", "node_modules/*", "packages/ui/src/components/ui/*"],
     "rules": {
+      "style": {
+        "noNonNullAssertion": "off"
+      },
       "performance": {
         "noDelete": "off"
       },

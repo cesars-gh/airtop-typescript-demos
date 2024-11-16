@@ -16,7 +16,7 @@ export function ShowLiveView({ liveViewUrl }: ShowLiveViewProps) {
           <div className="flex">
             <LiveView liveViewUrl={liveViewUrl} />
           </div>
-          <div className="flex m-4">
+          <div className="flex mt-4">
             <ContinueForm />
           </div>
         </div>

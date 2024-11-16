@@ -9,6 +9,7 @@ type State = {
 };
 
 type Actions = {
+  resetResponse: () => void;
   setApiKey: (apiKey: string) => void;
   setStartResponse: (startResponse: StartResponse) => void;
   setContinueResponse: (continueResponse: ContinueResponse) => void;
@@ -18,6 +19,11 @@ export const useAppStore = create<State & Actions>()(
   immer((set) => ({
     apiKey: "",
     response: {},
+    resetResponse: () => {
+      set((state) => {
+        state.response = {};
+      });
+    },
     setApiKey: (apiKey: string) => {
       set((state) => {
         state.apiKey = apiKey;

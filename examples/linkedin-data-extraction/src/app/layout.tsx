@@ -8,8 +8,8 @@ import { Body } from "@local/ui";
 const inter = Inter({ subsets: ["latin"], display: "swap" });
 
 export const metadata: Metadata = {
-  title: "Airtop Demo",
-  description: "Airtop demonstration",
+  title: "Airtop: LinkedIn Data Extraction",
+  description: "Extracts data from LinkedIn using the Airtop SDK",
 };
 
 export default async function RootLayout({ children }: PropsWithChildren) {

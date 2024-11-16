@@ -8,7 +8,7 @@
     ".": {
       "import": "./dist/index.js"
     },
-    "./api/terminate-session/route.js": "./dist/api/terminate-session/route.js"
+    "./api/terminate-session/*.js": "./dist/api/terminate-session/*.js"
   },
   "author": "",
   "keywords": [],

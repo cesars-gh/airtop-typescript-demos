@@ -40,3 +40,4 @@ Most examples use the following:
 - [React Hook Form](https://react-hook-form.com/) for forms
 - [Loglayer](https://github.com/theogravity/loglayer) for logging (backed using `console.log`)
 - [Inquirer.js](https://www.npmjs.com/package/inquirer) for CLI prompts
+- [Biome](https://biomejs.dev/) for linting and formatting
