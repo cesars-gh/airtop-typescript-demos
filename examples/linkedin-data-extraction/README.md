@@ -19,6 +19,7 @@ called `LinkedInExtractorService`.
 
 - This is implemented in the web application in the Next.js app router API routes in `src/app/api`.
 - The CLI implementation is found in `src/cli/linkedin-extractor.cli.ts`.
+- The prompts and values used for the demo is located in `src/consts.ts`
 
 ## Installation
 

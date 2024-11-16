@@ -20,11 +20,19 @@ import type React from "react";
 import { useCallback } from "react";
 import { useForm } from "react-hook-form";
 
+/**
+ * StartForm Component
+ * A form component that handles LinkedIn profile data extraction initialization.
+ * It collects an API key and profile ID from the user and makes a POST request
+ * to start the extraction process.
+ */
 export function StartForm() {
+  // Get state management functions from the app store
   const setStartResponse = useAppStore((state) => state.setStartResponse);
   const setApiKey = useAppStore((state) => state.setApiKey);
   const handleError = useHandleError();
 
+  // Initialize form with Zod validation schema
   const form = useForm<StartRequest>({
     resolver: zodResolver(startRequestSchema),
     defaultValues: {
@@ -33,6 +41,7 @@ export function StartForm() {
     },
   });
 
+  // Handle form submission
   const onSubmit = useCallback(
     async (data: StartRequest) => {
       setApiKey(data.apiKey);
@@ -60,6 +69,7 @@ export function StartForm() {
     [setStartResponse, setApiKey, handleError],
   );
 
+  // Prevent form default behavior and handle submission
   const handleFormSubmit = useCallback(
     (event: React.FormEvent<HTMLFormElement>) => {
       event.preventDefault(); // Prevent the default form submission behavior which will refresh the page

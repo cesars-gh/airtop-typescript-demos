@@ -2,6 +2,9 @@ import { metadata } from "@/app/layout";
 import { MainContent } from "@/components/MainContent";
 import { PageHeader } from "@local/ui";
 
+/**
+ * The main page of the application.
+ */
 export default function MainPage() {
   return (
     <>

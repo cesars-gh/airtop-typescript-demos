@@ -10,7 +10,7 @@
     "build": "pnpm run lint && next build",
     "start": "next start",
     "lint": "biome check --write --unsafe src && biome format src --write && biome lint src --fix",
-    "verify-types": "tsc --noEmit"
+    "verify-types": "tsc --project tsconfig.json --noEmit"
   },
   "dependencies": {
     "@airtop/sdk": "0.1.5",

@@ -5,20 +5,31 @@ import { useAppStore } from "@/store";
 import { Button, ElapsedTime, useHandleError, useTerminateSession } from "@local/ui";
 import { useCallback, useState } from "react";
 
+/**
+ * ContinueForm Component
+ * This component handles the continuation of a LinkedIn data extraction session
+ * after a user has signed into LinkedIn. It provides options to either continue
+ * the extraction process or terminate the current session.
+ */
 export function ContinueForm() {
+  // Store state management hooks for handling responses and API key
   const setContinueResponse = useAppStore((state) => state.setContinueResponse);
   const resetResponse = useAppStore((state) => state.resetResponse);
   const apiKey = useAppStore((state) => state.apiKey);
   const startResponse = useAppStore((state) => state.response);
+
+  // Local state to manage form submission status
   const [isSubmitting, setIsSubmitting] = useState(false);
   const handleError = useHandleError();
 
+  // Hook to handle session termination
   const onTerminateSession = useTerminateSession({
     sessionId: startResponse.sessionId!,
     apiKey,
     onTerminate: resetResponse,
   });
 
+  // Handler for form submission
   const onSubmit = useCallback(async () => {
     setIsSubmitting(true);
 
@@ -38,7 +49,6 @@ export function ContinueForm() {
       }
 
       const result = (await response.json()) as ContinueResponse;
-
       setContinueResponse(result);
     } catch (e: any) {
       handleError({

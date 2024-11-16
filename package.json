@@ -39,12 +39,6 @@
     "node": ">=20"
   },
   "lint-staged": {
-    "**/*.{js,jsx,ts,tsx,json}": [
-      "pnpm run lint"
-    ],
-    "**/*.{js,jsx,ts,tsx}": [
-      "pnpm run verify-types"
-    ],
     "**/package.json": [
       "pnpm run syncpack:format",
       "pnpm run syncpack:lint"

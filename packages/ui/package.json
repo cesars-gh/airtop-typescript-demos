@@ -13,7 +13,7 @@
     "build:dev": "hash-runner",
     "build": "pnpm run lint && rm -rf dist && tsc && tsc-alias",
     "lint": "biome check --write --unsafe src && biome format src --write && biome lint src --fix",
-    "verify-types": "tsc --noEmit"
+    "verify-types": "tsc --project tsconfig.json --noEmit"
   },
   "dependencies": {
     "@hookform/resolvers": "3.9.1",
