@@ -8,7 +8,6 @@
     "lint": "turbo run lint --continue --",
     "changeset": "changeset",
     "changeset:add": "changeset add",
-    "lint-staged": "lint-staged",
     "lint:packages": "pnpm run lint:packages:semver && pnpm run lint:packages:mismatches",
     "lint:packages:semver": "syncpack lint-semver-ranges",
     "lint:packages:mismatches": "syncpack list-mismatches",
@@ -28,7 +27,6 @@
     "@commitlint/cli": "19.5.0",
     "@commitlint/config-conventional": "19.5.0",
     "husky": "9.1.6",
-    "lint-staged": "15.2.10",
     "syncpack": "13.0.0",
     "prettier": "3.3.3",
     "turbo": "2.3.0",
@@ -37,12 +35,6 @@
   },
   "engines": {
     "node": ">=20"
-  },
-  "lint-staged": {
-    "**/package.json": [
-      "pnpm run syncpack:format",
-      "pnpm run syncpack:lint"
-    ]
   },
   "packageManager": "pnpm@9.6.0"
 }

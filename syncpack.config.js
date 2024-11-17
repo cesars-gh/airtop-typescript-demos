@@ -8,10 +8,20 @@ module.exports = {
     "dependencies": ["**"],
     "packages": ["**"]
   }],
-  "versionGroups": [{
-    "label": "use workspace protocol for local packages",
-    "dependencies": ["$LOCAL"],
-    "dependencyTypes": ["!local"],
-    "pinVersion": "workspace:*"
-  }],
+  "versionGroups": [
+    {
+      "label": "use workspace protocol for local packages",
+      "dependencies": ["$LOCAL"],
+      "dependencyTypes": ["!local"],
+      "pinVersion": "workspace:*"
+    },
+    {
+      "dependencies": ["@sinclair/typebox"],
+      "pinVersion": "0.33.22"
+    },
+    {
+      "dependencies": ["geist"],
+      "pinVersion": "1.2.2"
+    }
+  ],
 };
