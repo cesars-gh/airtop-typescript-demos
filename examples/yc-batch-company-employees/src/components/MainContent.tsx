@@ -41,14 +41,14 @@ export function MainContent() {
     return <ShowLiveView liveViewUrl={apiResponse.liveViewUrl} />;
   }
 
-  // 2. Show batch selection if we have batches but no selection
-  if (batches && batches.length > 0) {
-    return <BatchSelectorForm batches={batches} />;
-  }
-
-  // 3. Show results if we have content
+  // 2. Show results if we have content
   if (apiResponse.content) {
     return <DisplayPromptResponse content={apiResponse.content} />;
+  }
+
+  // 3. Show batch selection if we have batches but no selection
+  if (batches && batches.length > 0) {
+    return <BatchSelectorForm batches={batches} />;
   }
 
   // 4. Default view - show initialization screen
