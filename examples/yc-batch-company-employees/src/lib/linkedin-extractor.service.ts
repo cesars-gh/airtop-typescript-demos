@@ -158,15 +158,25 @@ export class LinkedInExtractorService {
     const windowsToClose: string[] = [];
 
     const employeesListUrls = await this.processBatchedUrls(companyLinkedInProfileUrls, async (url) => {
-      const companyProfileWindow = await this.airtop.windows.create(sessionId, {
-        url,
-      });
+      let windowId: string | null = null;
+      try {
+        const companyProfileWindow = await this.airtop.windows.create(sessionId, {
+          url,
+        });
 
-      windowsToClose.push(companyProfileWindow.data.windowId);
+        windowId = companyProfileWindow.data.windowId;
+        windowsToClose.push(windowId);
 
-      const scrapedContent = await this.airtop.windows.scrapeContent(sessionId, companyProfileWindow.data.windowId);
+        const scrapedContent = await this.airtop.windows.scrapeContent(sessionId, windowId);
 
-      return this.extractEmployeeListUrl(scrapedContent.data.modelResponse.scrapedContent.text);
+        return this.extractEmployeeListUrl(scrapedContent.data.modelResponse.scrapedContent.text);
+      } catch (error) {
+        this.log.error("Error extracting employees list URL for company LinkedIn profile URL", JSON.stringify(error));
+        this.log.error("Company LinkedIn profile URL:", url);
+        this.log.error("Session ID:", sessionId);
+        this.log.error("Window ID:", windowId);
+        return null;
+      }
     });
 
     await this.terminateWindows(sessionId, windowsToClose);

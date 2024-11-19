@@ -45,7 +45,7 @@ async function cli() {
   log.info("Now we will extract the LinkedIn profile urls from the companies");
   log.info("This might take a while...");
 
-  const linkedInProfileUrls = await ycService.getCompaniesLinkedInProfileUrls(companies.slice(0, 3));
+  const linkedInProfileUrls = await ycService.getCompaniesLinkedInProfileUrls(companies.slice(0, 5));
   log.info("LinkedIn profile urls:\n\n", chalk.green(JSON.stringify(linkedInProfileUrls, null, 2)));
 
   const linkedInSession = await linkedInService.createSession(profileId);

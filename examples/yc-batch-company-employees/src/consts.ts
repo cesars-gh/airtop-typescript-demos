@@ -34,7 +34,6 @@ const IS_LOGGED_IN_SCHEMA = baseSchema.extend({
   isLoggedIn: z.boolean().describe("Whether the user is logged in or not"),
 });
 
-// export const IS_LOGGED_IN_OUTPUT_SCHEMA = zodToJsonSchema(IS_LOGGED_IN_SCHEMA);
 export type IsLoggedInResponse = z.infer<typeof IS_LOGGED_IN_SCHEMA>;
 
 export const YC_COMPANIES_URL = "https://www.ycombinator.com/companies";
