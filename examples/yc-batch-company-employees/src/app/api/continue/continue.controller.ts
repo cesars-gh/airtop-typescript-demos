@@ -1,5 +1,5 @@
 import type { ContinueResponse } from "@/app/api/continue/continue.validation";
-import { LinkedInExtractorService } from "@/lib/linkedin-extractor.service";
+import { YCExtractorService } from "@/lib/yc-extractor.service";
 import type { LogLayer } from "loglayer";
 
 /**
@@ -13,12 +13,11 @@ import type { LogLayer } from "loglayer";
 interface ContinueControllerParams {
   apiKey: string;
   sessionId: string;
-  windowId: string;
   log: LogLayer;
 }
 
 /**
- * Controller to handle continuation of LinkedIn data extraction
+ * Controller to handle continuation of LinkedIn Login - fetching batches
  * @param {ContinueControllerParams} params - The parameters needed for extraction
  * @returns {Promise<ContinueResponse>} The extracted LinkedIn content
  */
@@ -26,21 +25,22 @@ export async function continueController({
   apiKey,
   log,
   sessionId,
-  windowId,
 }: ContinueControllerParams): Promise<ContinueResponse> {
-  // Initialize the LinkedIn extractor service with API key and logging
-  const service = new LinkedInExtractorService({ apiKey, log });
+  // Initialize the YCombinator extractor service with API key and logging
+  const service = new YCExtractorService({ apiKey, log });
 
-  // Extract LinkedIn data using the provided session
-  const content = await service.getEmployeesListUrls(
-    [
-      "https://www.linkedin.com/company/asha-health-ai/", // Dummy DATA until webb app completed
-    ],
-    sessionId,
-  );
+  try {
+    // Fetch YC batches
+    const batches = await service.getYcBatches(sessionId);
 
-  // Return the extracted content wrapped in the expected response format
-  return {
-    content: JSON.stringify(content, null, 2),
-  };
+    log.info("LALALA Fetched YC batches", JSON.stringify(batches, null, 2));
+
+    return {
+      sessionId,
+      batches: batches,
+    };
+  } catch (error) {
+    await service.terminateSession(sessionId);
+    throw error;
+  }
 }

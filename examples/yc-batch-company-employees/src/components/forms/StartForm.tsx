@@ -52,6 +52,8 @@ export function StartForm() {
           body: JSON.stringify(data),
         });
 
+        console.info("LALALA Response", JSON.stringify(response, null, 2));
+
         if (!response.ok) {
           const errorData = await response.json();
           throw errorData;

@@ -1,4 +1,5 @@
 "use client";
+import { BatchSelectorForm } from "@/components/forms/BatchSelectionForm";
 import { DisplayPromptResponse } from "@/components/views/DisplayPromptResponse";
 import { InitializeView } from "@/components/views/InitializeView";
 import { ShowLiveView } from "@/components/views/ShowLiveView";
@@ -10,6 +11,7 @@ export function MainContent() {
   // Get API key and response from global state
   const apiKey = useAppStore((state) => state.apiKey);
   const apiResponse = useAppStore((state) => state.response);
+  const batches = useAppStore((state) => state.batches);
 
   // Hook to handle session termination when needed
   const terminateSession = useTerminateSession({
@@ -20,17 +22,13 @@ export function MainContent() {
   // Effect to clean up sessions when user leaves the page
   useEffect(() => {
     const handleBeforeUnload = () => {
-      // Only terminate if we have an active session (sessionId + apiKey)
-      // but no content yet (still processing)
       if (apiResponse.sessionId && apiKey && !apiResponse.content) {
         terminateSession();
       }
     };
 
-    // Add event listener for page unload
     window.addEventListener("beforeunload", handleBeforeUnload);
 
-    // Cleanup function to remove event listener
     return () => {
       window.removeEventListener("beforeunload", handleBeforeUnload);
     };
@@ -43,11 +41,16 @@ export function MainContent() {
     return <ShowLiveView liveViewUrl={apiResponse.liveViewUrl} />;
   }
 
-  // 2. Show results if we have content
+  // 2. Show batch selection if we have batches but no selection
+  if (batches && batches.length > 0) {
+    return <BatchSelectorForm batches={batches} />;
+  }
+
+  // 3. Show results if we have content
   if (apiResponse.content) {
     return <DisplayPromptResponse content={apiResponse.content} />;
   }
 
-  // 3. Default view - show initialization screen
+  // 4. Default view - show initialization screen
   return <InitializeView />;
 }

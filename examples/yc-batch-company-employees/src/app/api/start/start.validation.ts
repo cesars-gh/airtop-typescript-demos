@@ -14,6 +14,7 @@ export const startResponseSchema = z.object({
   liveViewUrl: z.string().optional().describe("The URL to connect to the browser live view"),
   signInRequired: z.boolean().optional().describe("Whether the user needs to sign in"),
   content: z.string().optional().describe("The response to the prompt only if signInRequired is false"),
+  batches: z.array(z.string()).optional().describe("The list of YC batches"),
 });
 
 export type StartResponse = z.infer<typeof startResponseSchema>;

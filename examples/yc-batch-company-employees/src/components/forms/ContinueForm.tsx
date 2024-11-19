@@ -39,7 +39,6 @@ export function ContinueForm() {
         body: JSON.stringify({
           apiKey,
           sessionId: startResponse.sessionId,
-          windowId: startResponse.windowId,
         } as ContinueRequest),
       });
 

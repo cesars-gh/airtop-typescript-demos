@@ -13,10 +13,14 @@ export async function POST(request: NextRequest) {
 
   const data = (await request.json()) as StartRequest;
 
-  log.info("Validating request data");
+  log.info("LALALA Received request data", JSON.stringify(data, null, 2));
+
+  log.info("LALALA Validating request data");
 
   try {
     startRequestSchema.parse(data);
+
+    log.info("LALALA Request data is valid");
 
     const controllerResponse = await startController({ log, ...data });
     return NextResponse.json<StartResponse>(controllerResponse);
