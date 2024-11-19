@@ -22,7 +22,7 @@ import { useForm } from "react-hook-form";
 
 /**
  * StartForm Component
- * A form component that handles LinkedIn profile data extraction initialization.
+ * A form component that handles YCombinator and LinkedIn profile data extraction initialization.
  * It collects an API key and profile ID from the user and makes a POST request
  * to start the extraction process.
  */

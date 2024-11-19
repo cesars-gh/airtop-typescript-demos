@@ -7,7 +7,6 @@ import type { LogLayer } from "loglayer";
  * @interface ContinueControllerParams
  * @property {string} apiKey - API key for authentication
  * @property {string} sessionId - Unique identifier for the current session
- * @property {string} windowId - Identifier for the browser window
  * @property {LogLayer} log - Logging utility instance
  */
 interface ContinueControllerParams {
@@ -19,7 +18,7 @@ interface ContinueControllerParams {
 /**
  * Controller to handle continuation of LinkedIn Login - fetching batches
  * @param {ContinueControllerParams} params - The parameters needed for extraction
- * @returns {Promise<ContinueResponse>} The extracted LinkedIn content
+ * @returns {Promise<ContinueResponse>} The extracted YC batches
  */
 export async function continueController({
   apiKey,

@@ -6,9 +6,17 @@ app routing and a CLI tool that demonstrates how to extract data from YCombinato
 - Given an Airtop API key, the code goes to YCombinator company pages and extract the list of batches to choose from
 - Once the batch list is fetched, the user can choose a batch and the code will extract the list of companies in the batch
 - For each company, the code will extract the list of employees
-- The results are printed to the console
+- The results are displayed to the user in the web application
 
 ## Code
+
+The Airtop code used by the web application and CLI is located in `src/lib/yc-extractor.service.ts` as a class
+called `YCExtractorService`. There is also a `LinkedInExtractorService` in the same path that is used to extract
+LinkedIn profile URLs for the employees.
+
+- This is implemented in the web application in the Next.js app router API routes in `src/app/api`.
+- The CLI implementation is found in `src/cli/yc-compay-employees.cli.ts`.
+- The prompts and values used for the demo is located in `src/consts.ts`
 
 ## Installation
 
