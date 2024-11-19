@@ -36,7 +36,7 @@ export async function continueController({
     [
       "https://www.linkedin.com/company/asha-health-ai/", // Dummy DATA until webb app completed
     ],
-    sessionId
+    sessionId,
   );
 
   // Return the extracted content wrapped in the expected response format
