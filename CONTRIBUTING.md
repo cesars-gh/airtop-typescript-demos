@@ -9,8 +9,17 @@
 - Define API routes in the `src/app/api` directory
 - Define CLI examples in the `src/cli` directory
 
+### Registering the example in the proxy
+
+This will allow the example to be accessed via `examples.airtop.ai`:
+
+- Edit the `packages/home-config/src/index.ts` file and add the directory name that the example uses
+- Run `turbo build` to rebuild the package
+- Edit your example's `next.config.js` and update `...registerToHome()` to the directory name that the example uses
+
 ## Before a commit
 
+- `package.json` dependencies should be pinned to the exact version. 
 - Commit messages should follow the [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/) specification.
     * The commit message should be in the format `<type>(<scope>): <description>`. The `scope` is optional. The description must be lowercased.
 - This project uses [changeset](https://github.com/changesets/changesets) for managing releases. Use the `changeset:add` 

@@ -1,8 +1,7 @@
 {
-  "name": "@local/tailwind-config",
-  "description": "Tailwind configuration for airtop demos",
+  "name": "@internal/home-config",
+  "description": "Routing configuration for the home site",
   "version": "1.0.0",
-  "type": "module",
   "private": true,
   "exports": {
     ".": {
@@ -11,18 +10,17 @@
       "default": "./dist/index.js"
     }
   },
+  "author": "",
+  "keywords": [],
   "scripts": {
     "build:dev": "hash-runner",
     "build": "rm -rf dist && tsc",
     "lint": "biome check --write --unsafe src && biome format src --write && biome lint src --fix",
     "verify-types": "tsc --project tsconfig.json --noEmit"
   },
-  "dependencies": {
-    "tailwindcss": "3.4.15",
-    "tailwindcss-animate": "1.0.7"
-  },
   "devDependencies": {
     "@local/typescript-config": "workspace:*",
+    "@types/node": "22.9.0",
     "hash-runner": "2.0.1",
     "typescript": "5.6.3"
   },

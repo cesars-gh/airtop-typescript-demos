@@ -1,6 +1,6 @@
 {
   "$schema": "https://unpkg.com/@changesets/config@3.0.0/schema.json",
-  "changelog": ["@changesets/changelog-github", { "repo":  "airtop-ai/demos" }],
+  "changelog": ["@changesets/changelog-github", { "repo":  "airtop-ai/examples" }],
   "access": "public",
   "baseBranch": "main"
 }

@@ -27,8 +27,8 @@ importers:
         specifier: workspace:*
         version: link:packages/typescript-config
       husky:
-        specifier: 9.1.6
-        version: 9.1.6
+        specifier: 9.1.7
+        version: 9.1.7
       prettier:
         specifier: 3.3.3
         version: 3.3.3
@@ -38,6 +38,34 @@ importers:
       turbo:
         specifier: 2.3.0
         version: 2.3.0
+      typescript:
+        specifier: 5.6.3
+        version: 5.6.3
+
+  examples/_home:
+    dependencies:
+      '@internal/home-config':
+        specifier: workspace:*
+        version: link:../../packages/home-config
+      next:
+        specifier: 15.0.3
+        version: 15.0.3(react-dom@19.0.0-rc-66855b96-20241106(react@19.0.0-rc-66855b96-20241106))(react@19.0.0-rc-66855b96-20241106)
+      react:
+        specifier: 19.0.0-rc-66855b96-20241106
+        version: 19.0.0-rc-66855b96-20241106
+      react-dom:
+        specifier: 19.0.0-rc-66855b96-20241106
+        version: 19.0.0-rc-66855b96-20241106(react@19.0.0-rc-66855b96-20241106)
+    devDependencies:
+      '@types/node':
+        specifier: 22.9.0
+        version: 22.9.0
+      '@types/react':
+        specifier: 18.3.12
+        version: 18.3.12
+      '@types/react-dom':
+        specifier: 18.3.1
+        version: 18.3.1
       typescript:
         specifier: 5.6.3
         version: 5.6.3
@@ -53,6 +81,9 @@ importers:
       '@inquirer/prompts':
         specifier: 7.1.0
         version: 7.1.0(@types/node@22.9.0)
+      '@internal/home-config':
+        specifier: workspace:*
+        version: link:../../packages/home-config
       '@local/ui':
         specifier: workspace:*
         version: link:../../packages/ui
@@ -132,6 +163,21 @@ importers:
       tsx:
         specifier: 4.19.2
         version: 4.19.2
+      typescript:
+        specifier: 5.6.3
+        version: 5.6.3
+
+  packages/home-config:
+    devDependencies:
+      '@local/typescript-config':
+        specifier: workspace:*
+        version: link:../typescript-config
+      '@types/node':
+        specifier: 22.9.0
+        version: 22.9.0
+      hash-runner:
+        specifier: 2.0.1
+        version: 2.0.1
       typescript:
         specifier: 5.6.3
         version: 5.6.3
@@ -1720,8 +1766,8 @@ packages:
   human-id@1.0.2:
     resolution: {integrity: sha512-UNopramDEhHJD+VR+ehk8rOslwSfByxPIZyJRfV739NDhN5LF1fa1MqnzKm2lGTQRjNrjK19Q5fhkgIfjlVUKw==}
 
-  husky@9.1.6:
-    resolution: {integrity: sha512-sqbjZKK7kf44hfdE94EoX8MZNk0n7HeW37O4YrVGCF4wzgQjp+akPAkfUK5LZ6KuR/6sqeAVuXHji+RzQgOn5A==}
+  husky@9.1.7:
+    resolution: {integrity: sha512-5gs5ytaNjBrh5Ow3zrvdUUY+0VxIuWVL4i9irt6friV+BqdCfmV11CQTWMiBYWHbXhco+J1kHfTOUkePhCDvMA==}
     engines: {node: '>=18'}
     hasBin: true
 
@@ -4317,7 +4363,7 @@ snapshots:
 
   human-id@1.0.2: {}
 
-  husky@9.1.6: {}
+  husky@9.1.7: {}
 
   iconv-lite@0.4.24:
     dependencies:
