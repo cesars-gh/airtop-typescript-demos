@@ -26,39 +26,37 @@ export async function startController({ apiKey, profileId, log }: StartControlle
   const service = new LinkedInExtractorService({ apiKey, log });
 
   // Start a new browser session and get window information
-  const { session, windowInfo } = await service.initializeSessionAndBrowser(profileId);
+  const session = await service.createSession(profileId);
 
   // Check if the user is already authenticated with LinkedIn
-  const isSignedIn = await service.checkIfSignedIntoLinkedIn({
-    sessionId: session.id,
-    windowId: windowInfo.data.windowId,
-  });
+  const isSignedIn = await service.checkIfSignedIntoLinkedIn(session.data.id);
 
   // If not signed in, return the live view URL for manual authentication
   if (!isSignedIn) {
-    log.info(
-      "Sign-in to Linkedin is required, returning results with URL to live view",
-      chalk.blueBright(windowInfo.data.liveViewUrl),
-    );
+    const liveViewUrl = await service.getLinkedInLoginPageLiveViewUrl(session.data.id);
+
+    log.info("Sign-in to Linkedin is required, returning results with URL to live view", chalk.blueBright(liveViewUrl));
 
     return {
-      sessionId: session.id,
-      windowId: windowInfo.data.windowId,
-      profileId: session.profileId,
-      liveViewUrl: windowInfo.data.liveViewUrl,
+      sessionId: session.data.id,
+      windowId: "random-id",
+      profileId: session.data.profileId,
+      liveViewUrl,
       signInRequired: true,
     };
   }
 
   // Extract LinkedIn data using the authenticated session
-  const content = await service.extractLinkedInData({
-    sessionId: session.id,
-    windowId: windowInfo.data.windowId,
-  });
+  const content = await service.getEmployeesListUrls(
+    [
+      "https://www.linkedin.com/company/asha-health-ai/", // Dummy DATA until webb app completed
+    ],
+    session.data.id,
+  );
 
   // Return the extracted content
   return {
     signInRequired: false,
-    content,
+    content: JSON.stringify(content, null, 2),
   };
 }

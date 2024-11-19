@@ -1,11 +1,11 @@
 {
-  "name": "linkedin-data-extraction",
-  "description": "Airtop Demo: LinkedIn Data Extraction",
+  "name": "yc-batch-company-employees",
+  "description": "Airtop Demo: YC Batch Company Employees",
   "version": "0.1.0",
   "type": "module",
   "private": true,
   "scripts": {
-    "cli": "NODE_OPTIONS=\"--no-deprecation\" tsx ./src/cli/linkedin-data-extraction.cli.ts",
+    "cli": "NODE_OPTIONS=\"--no-deprecation\" tsx ./src/cli/yc-company-employees.cli.ts",
     "dev": "next dev --turbopack",
     "build": "pnpm run lint && next build",
     "start": "next start",

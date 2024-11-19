@@ -31,14 +31,16 @@ export async function continueController({
   // Initialize the LinkedIn extractor service with API key and logging
   const service = new LinkedInExtractorService({ apiKey, log });
 
-  // Extract LinkedIn data using the provided session and window IDs
-  const content = await service.extractLinkedInData({
-    sessionId,
-    windowId,
-  });
+  // Extract LinkedIn data using the provided session
+  const content = await service.getEmployeesListUrls(
+    [
+      "https://www.linkedin.com/company/asha-health-ai/", // Dummy DATA until webb app completed
+    ],
+    sessionId
+  );
 
   // Return the extracted content wrapped in the expected response format
   return {
-    content,
+    content: JSON.stringify(content, null, 2),
   };
 }

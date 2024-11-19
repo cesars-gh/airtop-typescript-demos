@@ -1,20 +1,15 @@
-import {
-  EXTRACT_DATA_OUTPUT_SCHEMA,
-  EXTRACT_DATA_PROMPT,
-  IS_LOGGED_IN_OUTPUT_SCHEMA,
-  IS_LOGGED_IN_PROMPT,
-  LOGIN_URL,
-  TARGET_URL,
-} from "@/consts";
+import { IS_LOGGED_IN_OUTPUT_SCHEMA, IS_LOGGED_IN_PROMPT, type IsLoggedInResponse, LINKEDIN_FEED_URL } from "@/consts";
 import { AirtopClient } from "@airtop/sdk";
+import type { SessionResponse, WindowIdResponse } from "@airtop/sdk/api";
 import type { LogLayer } from "loglayer";
 
 /**
- * Service for extracting LinkedIn data using the Airtop client.
+ * Service for extracting data from LinkedIn.
  */
 export class LinkedInExtractorService {
-  client: AirtopClient;
+  airtop: AirtopClient;
   log: LogLayer;
+  windows: WindowIdResponse[];
 
   /**
    * Creates a new instance of LinkedInExtractorService.
@@ -22,115 +17,202 @@ export class LinkedInExtractorService {
    * @param {string} params.apiKey - API key for Airtop client authentication
    * @param {LogLayer} params.log - Logger instance for service operations
    */
-  constructor({
-    apiKey,
-    log,
-  }: {
-    apiKey: string;
-    log: LogLayer;
-  }) {
-    this.client = new AirtopClient({
-      apiKey,
-    });
+  constructor({ apiKey, log }: { apiKey: string; log: LogLayer }) {
+    this.airtop = new AirtopClient({ apiKey });
     this.log = log;
+    this.windows = [];
   }
 
   /**
-   * Initializes a new browser session and window.
-   * @param {string} [profileId] - Optional profile ID for session persistence
-   * @returns {Promise<{session: any, windowInfo: any}>} Session and window information
+   * Extracts the LinkedIn employees search URL from the given text
+   * @param text - The text to extract the LinkedIn employees search URL from
+   * @returns The LinkedIn employees search URL or null if not found
    */
-  async initializeSessionAndBrowser(profileId?: string): Promise<{ session: any; windowInfo: any }> {
-    this.log.info("Creating a new session");
-    const createSessionResponse = await this.client.sessions.create({
+  extractEmployeeListUrl(text: string): string | null {
+    // Pattern to match LinkedIn employees search URLs
+    const pattern = /https:\/\/www\.linkedin\.com\/search\/results\/people\/\?[^"\s]*/g;
+
+    // Find all search URLs
+    const matches = text.match(pattern);
+
+    // Filter to only include URLs with currentCompany parameter
+    const employeesUrl = matches?.find((url) => url.includes("currentCompany="));
+
+    return employeesUrl || null;
+  }
+
+  /**
+   * Extracts the LinkedIn employees list URLs from the given text
+   * @param text - The text to extract the LinkedIn employees list URLs from
+   * @returns The list of LinkedIn employees list URLs
+   */
+  extractEmployeeProfileUrls(text: string): string[] {
+    // Pattern to match LinkedIn profile URLs that appear after navigationUrl
+    const pattern = /"navigationUrl":"(https?:\/\/(?:www\.)?linkedin\.com\/in\/[a-zA-Z0-9_-]+(?:\?[^"]*)?)/g;
+
+    // Find all matches and extract just the URL part
+    const matches = [...text.matchAll(pattern)].map((match) => match[1]);
+
+    // Remove any query parameters to get clean profile URLs
+    const cleanUrls = matches.map((url) => url?.split("?")[0]).filter(Boolean) as string[];
+
+    // Remove duplicates
+    return [...new Set(cleanUrls)];
+  }
+
+  /**
+   * Processes a list of URLs in batches to avoid rate limiting / overloading issues
+   * @param urls - The list of URLs to process
+   * @param processor - The function to process each URL
+   * @param batchSize - The size of the batch
+   * @param delayBetweenBatchesInMs - The delay between batches in milliseconds
+   * @returns The results of processing each URL
+   */
+  async processBatchedUrls<T>(
+    urls: string[],
+    processor: (url: string) => Promise<T>,
+    batchSize = 3,
+    delayBetweenBatchesInMs = 3000,
+  ): Promise<T[]> {
+    const results: T[] = [];
+
+    for (let i = 0; i < urls.length; i += batchSize) {
+      const batch = urls.slice(i, i + batchSize);
+
+      const batchResults = await Promise.all(batch.map(processor));
+
+      results.push(...batchResults);
+
+      // Wait for the specified delay between batches
+      await new Promise((resolve) => setTimeout(resolve, delayBetweenBatchesInMs));
+    }
+
+    return results;
+  }
+
+  /**
+   * Creates a new session.
+   * @param profileId - The ID of the profile to use for the session
+   * @returns The created session
+   */
+  async createSession(profileId?: string): Promise<SessionResponse> {
+    const session = await this.airtop.sessions.create({
       configuration: {
-        timeoutMinutes: 10,
-        persistProfile: !profileId, // Only persist a new profile if we do not have an existing profileId
-        baseProfileId: profileId,
+        timeoutMinutes: 15,
+        persistProfile: Boolean(!profileId), // Only persist a new profile if we do not have an existing profileId
+        ...(profileId ? { baseProfileId: profileId } : {}),
       },
     });
 
-    const session = createSessionResponse.data;
-    this.log.info("Created session", session.id);
-
-    if (!createSessionResponse.data.cdpWsUrl) {
-      throw new Error("Unable to get cdp url");
-    }
-
-    this.log.info("Creating browser window");
-    const windowResponse = await this.client.windows.create(session.id, { url: LOGIN_URL });
-
-    this.log.info("Getting browser window info");
-    const windowInfo = await this.client.windows.getWindowInfo(session.id, windowResponse.data.windowId);
-
-    return {
-      session,
-      windowInfo,
-    };
+    return session;
   }
 
   /**
-   * Checks if the user is currently signed into LinkedIn.
-   * @param {Object} params - Parameters for checking login status
-   * @param {string} params.sessionId - Active session ID
-   * @param {string} params.windowId - Active window ID
-   * @returns {Promise<boolean>} Whether the user is logged in
+   * Terminates a session.
+   * @param sessionId - The ID of the session to terminate
    */
-  async checkIfSignedIntoLinkedIn({ sessionId, windowId }: { sessionId: string; windowId: string }): Promise<boolean> {
-    this.log.info("Determining whether the user is logged in...");
-    const isLoggedInPromptResponse = await this.client.windows.pageQuery(sessionId, windowId, {
+  async terminateSession(sessionId: string): Promise<void> {
+    await this.airtop.sessions.terminate(sessionId);
+  }
+
+  /**
+   * Terminates windows associated with a session.
+   */
+  async terminateWindows(sessionId: string, windowIds: string[]): Promise<void> {
+    await Promise.all(windowIds.map(async (windowId) => this.airtop.windows.close(sessionId, windowId)));
+  }
+
+  /**
+   * Checks if the user is signed into LinkedIn
+   * @param sessionId - The ID of the session
+   * @returns Whether the user is signed into LinkedIn
+   */
+  async checkIfSignedIntoLinkedIn(sessionId: string): Promise<boolean> {
+    const window = await this.airtop.windows.create(sessionId, {
+      url: LINKEDIN_FEED_URL,
+    });
+
+    const modelResponse = await this.airtop.windows.pageQuery(sessionId, window.data.windowId, {
       prompt: IS_LOGGED_IN_PROMPT,
       configuration: {
         outputSchema: IS_LOGGED_IN_OUTPUT_SCHEMA,
       },
     });
 
-    this.log.info("Parsing response to if the user is logged in");
-    const parsedResponse = JSON.parse(isLoggedInPromptResponse.data.modelResponse);
-
-    if (parsedResponse.error) {
-      throw new Error(parsedResponse.error);
+    if (!modelResponse.data.modelResponse || modelResponse.data.modelResponse === "") {
+      throw new Error("No response from LinkedIn");
     }
 
-    return parsedResponse.isLoggedIn;
+    const response = JSON.parse(modelResponse.data.modelResponse) as IsLoggedInResponse;
+
+    return response.isLoggedIn;
   }
 
   /**
-   * Extracts data from LinkedIn by navigating to the target URL and querying the page.
-   * @param {Object} params - Parameters for data extraction
-   * @param {string} params.sessionId - Active session ID
-   * @param {string} params.windowId - Active window ID
-   * @returns {Promise<string>} Formatted JSON string containing extracted data
+   * Gets the LinkedIn employees list URLs for a list of company LinkedIn profile URLs
+   * @param companyLinkedInProfileUrls - The list of company LinkedIn profile URLs
+   * @param sessionId - The ID of the session
+   * @returns The list of LinkedIn employees list URLs
    */
-  async extractLinkedInData({ sessionId, windowId }: { sessionId: string; windowId: string }): Promise<string> {
-    this.log.info("Extracting data from LinkedIn");
+  async getEmployeesListUrls(companyLinkedInProfileUrls: string[], sessionId: string): Promise<string[]> {
+    const windowsToClose: string[] = [];
 
-    // Navigate to the target URL
-    this.log.info("Navigating to target url");
+    const employeesListUrls = await this.processBatchedUrls(companyLinkedInProfileUrls, async (url) => {
+      const companyProfileWindow = await this.airtop.windows.create(sessionId, {
+        url,
+      });
 
-    await this.client.windows.loadUrl(sessionId, windowId, { url: TARGET_URL });
+      windowsToClose.push(companyProfileWindow.data.windowId);
 
-    this.log.info("Prompting the AI agent, waiting for a response (this may take a few minutes)...");
+      const scrapedContent = await this.airtop.windows.scrapeContent(sessionId, companyProfileWindow.data.windowId);
 
-    const promptContentResponse = await this.client.windows.pageQuery(sessionId, windowId, {
-      prompt: EXTRACT_DATA_PROMPT,
-      followPaginationLinks: true, // This will tell the agent to load additional results via pagination links or scrolling
-      configuration: {
-        outputSchema: EXTRACT_DATA_OUTPUT_SCHEMA,
-      },
+      return this.extractEmployeeListUrl(scrapedContent.data.modelResponse.scrapedContent.text);
     });
 
-    this.log.info("Got response from AI agent, formatting JSON");
+    await this.terminateWindows(sessionId, windowsToClose);
 
-    const formattedJson = JSON.stringify(JSON.parse(promptContentResponse.data.modelResponse), null, 2);
+    // Filter out any null values and remove duplicates
+    return [...new Set(employeesListUrls.filter((url) => url !== null))];
+  }
 
-    this.log.info("Closing window and terminating session");
+  /**
+   * Gets the LinkedIn employees profile URLs for a list of LinkedIn employees list URLs
+   * @param employeesListUrls - The list of LinkedIn employees list URLs
+   * @param sessionId - The ID of the session
+   * @returns The list of LinkedIn employees profile URLs
+   */
+  async getEmployeesProfileUrls(employeesListUrls: string[], sessionId: string): Promise<string[]> {
+    const windowsToClose: string[] = [];
 
-    await this.client.windows.close(sessionId, windowId);
-    await this.client.sessions.terminate(sessionId);
+    const employeesProfileUrls = await this.processBatchedUrls(employeesListUrls, async (url) => {
+      const window = await this.airtop.windows.create(sessionId, {
+        url,
+      });
 
-    this.log.info("Cleanup completed");
+      windowsToClose.push(window.data.windowId);
 
-    return formattedJson;
+      const scrapedContent = await this.airtop.windows.scrapeContent(sessionId, window.data.windowId);
+
+      return this.extractEmployeeProfileUrls(scrapedContent.data.modelResponse.scrapedContent.text);
+    });
+
+    await this.terminateWindows(sessionId, windowsToClose);
+
+    return employeesProfileUrls.flat();
+  }
+
+  /**
+   * Gets the LinkedIn login page Live View URL
+   * @param sessionId - The ID of the session
+   * @returns The LinkedIn login page Live View URL
+   */
+  async getLinkedInLoginPageLiveViewUrl(sessionId: string): Promise<string> {
+    const linkedInWindow = await this.airtop.windows.create(sessionId, {
+      url: LINKEDIN_FEED_URL,
+    });
+
+    const windowInfo = await this.airtop.windows.getWindowInfo(sessionId, await linkedInWindow.data.windowId);
+
+    return windowInfo.data.liveViewUrl;
   }
 }
