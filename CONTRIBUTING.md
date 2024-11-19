@@ -16,6 +16,7 @@ This will allow the example to be accessed via `examples.airtop.ai`:
 - Edit the `packages/home-config/src/index.ts` file and add the directory name that the example uses
 - Run `turbo build` to rebuild the package
 - Edit your example's `next.config.js` and update `...registerToHome()` to the directory name that the example uses
+- Edit your example's `vercel.json` to use the directory name that the example uses
 
 ## Before a commit
 

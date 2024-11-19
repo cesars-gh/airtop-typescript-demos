@@ -9,7 +9,7 @@ export const registerToHome = (exampleName: EXAMPLES_DIRS) => {
 };
 
 export const getHomeConfig = (exampleName: EXAMPLES_DIRS) => {
-  const url = `https://${exampleName}.examples.airtop.ai`;
+  const url = `https://${exampleName}.examples.airtop.dev`;
 
   return [
     {
