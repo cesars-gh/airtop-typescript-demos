@@ -14,15 +14,15 @@ export const getHomeConfig = (exampleName: EXAMPLES_DIRS) => {
   return [
     {
       source: `/${exampleName}`,
-      destination: `${url}/${exampleName}`,
+      destination: url,
     },
     {
       source: `/${exampleName}/:path*`,
-      destination: `${url}/${exampleName}/:path*`,
+      destination: `${url}/:path*`,
     },
     {
       source: `/${exampleName}-static/:path*`,
-      destination: `${url}/:path*`,
+      destination: `${url}/${exampleName}-static/:path*`,
     },
   ];
 };
