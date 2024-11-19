@@ -12,11 +12,9 @@ interface StartControllerParams {
 export async function startController({ apiKey, log, profileId }: StartControllerParams): Promise<StartResponse> {
   // Initialize the LinkedIn extractor service
   const linkedInService = new LinkedInExtractorService({ apiKey, log });
-  log.info("LALALA Successfully initialized the services");
 
   // Create a new session
   const session = await linkedInService.createSession(profileId);
-  log.info("LALALA Successfully created session");
 
   try {
     const isLoggedIn = await linkedInService.checkIfSignedIntoLinkedIn(session.data.id);
@@ -38,8 +36,7 @@ export async function startController({ apiKey, log, profileId }: StartControlle
 
     // Fetch YC batches
     const batches = await service.getYcBatches(session.data.id);
-
-    log.info("LALALA Successfully fetched YC batches", JSON.stringify(batches, null, 2));
+    log.info("Successfully fetched YC batches", JSON.stringify(batches, null, 2));
 
     // Return the batches in the response
     return {

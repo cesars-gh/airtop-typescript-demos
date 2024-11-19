@@ -22,16 +22,16 @@ export async function processBatchController({
   try {
     // Get companies for the selected batch
     const companies = await service.getCompaniesInBatch(batch, sessionId);
-    log.info("LALALA Successfully fetched companies in batch", JSON.stringify(companies, null, 2));
+    log.info("Successfully fetched companies in batch", JSON.stringify(companies, null, 2));
 
     // Get LinkedIn profile urls for the companies
     const linkedInProfileUrls = await service.getCompaniesLinkedInProfileUrls(companies.slice(0, 2));
     log.info(
-      "LALALA Successfully fetched LinkedIn profile urls for the companies",
+      "Successfully fetched LinkedIn profile urls for the companies",
       JSON.stringify(linkedInProfileUrls, null, 2),
     );
     const isLoggedIn = await linkedInService.checkIfSignedIntoLinkedIn(sessionId);
-    log.info("LALALA Successfully checked if signed into LinkedIn", JSON.stringify(isLoggedIn));
+    log.info("Successfully checked if signed into LinkedIn before continuing", JSON.stringify(isLoggedIn));
 
     // If LinkedIn auth is needed, return the live view URL
     if (!isLoggedIn) {
@@ -46,9 +46,14 @@ export async function processBatchController({
 
     // Get employee list url for each company
     const employeesListUrls = await linkedInService.getEmployeesListUrls(linkedInProfileUrls, sessionId);
+    log.info("Successfully fetched employee list urls for the companies", JSON.stringify(employeesListUrls, null, 2));
 
     // Get employee's Profile Urls for each employee list url
     const employeesProfileUrls = await linkedInService.getEmployeesProfileUrls(employeesListUrls, sessionId);
+    log.info(
+      "Successfully fetched employee's profile urls for the employees",
+      JSON.stringify(employeesProfileUrls, null, 2),
+    );
 
     // Format the response
     return {

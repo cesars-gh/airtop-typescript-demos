@@ -9,7 +9,6 @@ type State = {
   response: StartResponse;
   batches: string[];
   selectedBatch?: string;
-  sessionId?: string;
 };
 
 type Actions = {
@@ -58,11 +57,10 @@ export const useAppStore = create<State & Actions>()(
     },
     setProcessBatchResponse: (processBatchResponse: ProcessBatchResponse) => {
       set((state) => {
-        state.response.content = processBatchResponse.content;
-        state.response.signInRequired = processBatchResponse.signInRequired;
-        if (processBatchResponse.liveViewUrl) {
-          state.response.liveViewUrl = processBatchResponse.liveViewUrl;
-        }
+        state.response = {
+          ...state.response,
+          ...processBatchResponse,
+        };
       });
     },
     setContinueResponse: (continueResponse: ContinueResponse) => {

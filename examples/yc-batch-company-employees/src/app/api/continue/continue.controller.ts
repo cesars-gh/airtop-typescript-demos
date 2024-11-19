@@ -33,8 +33,6 @@ export async function continueController({
     // Fetch YC batches
     const batches = await service.getYcBatches(sessionId);
 
-    log.info("LALALA Fetched YC batches", JSON.stringify(batches, null, 2));
-
     return {
       sessionId,
       batches: batches,

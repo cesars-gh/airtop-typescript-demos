@@ -1,5 +1,5 @@
 import { useAppStore } from "@/store";
-import { Button, Card, CardContent, CardHeader, CardTitle, ElapsedTime } from "@local/ui";
+import { Button, Card, CardContent, CardHeader, CardTitle, ElapsedTime, useHandleError } from "@local/ui";
 import { useCallback, useState } from "react";
 
 interface BatchSelectorFormProps {
@@ -7,12 +7,14 @@ interface BatchSelectorFormProps {
 }
 
 export function BatchSelectorForm({ batches }: BatchSelectorFormProps) {
-  const [selectedBatch, setSelectedBatch] = useState<string>("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const apiKey = useAppStore((state) => state.apiKey);
   const sessionId = useAppStore((state) => state.response.sessionId);
   const setProcessBatchResponse = useAppStore((state) => state.setProcessBatchResponse);
-  const setGlobalSelectedBatch = useAppStore((state) => state.setSelectedBatch);
+  const selectedBatch = useAppStore((state) => state.selectedBatch);
+  const setSelectedBatch = useAppStore((state) => state.setSelectedBatch);
+  // Add the error handler hook
+  const handleError = useHandleError();
 
   const handleBatchSelect = useCallback(async () => {
     if (!selectedBatch || !sessionId) {
@@ -22,7 +24,6 @@ export function BatchSelectorForm({ batches }: BatchSelectorFormProps) {
 
     setIsSubmitting(true);
     try {
-      setGlobalSelectedBatch(selectedBatch);
       console.log("Sending request to /api/process-batch");
       const response = await fetch("/api/process-batch", {
         method: "POST",
@@ -38,19 +39,21 @@ export function BatchSelectorForm({ batches }: BatchSelectorFormProps) {
 
       if (!response.ok) {
         const errorData = await response.json();
-        console.error("Error response:", errorData);
         throw errorData;
       }
 
       const result = await response.json();
       console.log("Success response:", result);
       setProcessBatchResponse(result);
-    } catch (error) {
-      console.error("Failed to process batch:", error);
+    } catch (e: any) {
+      handleError({
+        error: e,
+        consoleLogMessage: "Failed to process batch",
+      });
     } finally {
       setIsSubmitting(false);
     }
-  }, [selectedBatch, apiKey, sessionId, setProcessBatchResponse, setGlobalSelectedBatch]);
+  }, [selectedBatch, apiKey, sessionId, setProcessBatchResponse, handleError]);
 
   return (
     <Card>
@@ -61,7 +64,7 @@ export function BatchSelectorForm({ batches }: BatchSelectorFormProps) {
         <div className="flex flex-col space-y-4">
           <select
             className="w-full p-2 border rounded-md bg-background"
-            value={selectedBatch}
+            value={selectedBatch || ""}
             onChange={(e) => setSelectedBatch(e.target.value)}
           >
             <option value="">Select a batch...</option>
