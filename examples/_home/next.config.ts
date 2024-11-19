@@ -1,4 +1,4 @@
-import {EXAMPLES_DIRS, getHomeConfig} from "@internal/home-config";
+import { EXAMPLES_DIRS, getHomeConfig } from "@internal/home-config";
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
