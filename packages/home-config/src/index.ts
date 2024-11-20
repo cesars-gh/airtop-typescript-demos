@@ -1,5 +1,6 @@
 export enum EXAMPLES_DIRS {
   LINKEDIN_DATA_EXTRACTION = "linkedin-data-extraction",
+  YC_BATCH_COMPANY_EMPLOYEES = "yc-batch-company-employees",
 }
 
 export const registerToHome = (exampleName: EXAMPLES_DIRS) => {

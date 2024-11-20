@@ -181,6 +181,9 @@ importers:
       '@inquirer/prompts':
         specifier: 7.1.0
         version: 7.1.0(@types/node@22.9.0)
+      '@internal/home-config':
+        specifier: workspace:*
+        version: link:../../packages/home-config
       '@local/ui':
         specifier: workspace:*
         version: link:../../packages/ui
