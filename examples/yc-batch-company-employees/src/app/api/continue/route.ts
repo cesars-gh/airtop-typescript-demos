@@ -8,7 +8,7 @@ import { getLogger } from "@local/utils";
 import { type NextRequest, NextResponse } from "next/server";
 
 /**
- * Continues the process of extracting data from YCombinator after the user has completed sign-in.
+ * Continues the process of extracting data from yCombinator after the user has completed sign-in.
  */
 export async function POST(request: NextRequest): Promise<NextResponse<ContinueResponse>> {
   const log = getLogger().withPrefix("[api/continue]");

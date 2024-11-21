@@ -1,9 +1,9 @@
 # Airtop YC Batch Company's Employees's Profiles
 
 This is an example [Airtop](https://www.airtop.ai/) web application built with [`Next.js`](https://nextjs.org/)
-app routing and a CLI tool that demonstrates how to extract data from YCombinator and LinkedIn using the Airtop SDK.
+app routing and a CLI tool that demonstrates how to extract data from yCombinator and LinkedIn using the Airtop SDK.
 
-- Given an Airtop API key, the code goes to YCombinator company pages and extract the list of batches to choose from
+- Given an Airtop API key, the code goes to yCombinator company pages and extract the list of batches to choose from
 - Once the batch list is fetched, the user can choose a batch and the code will extract the list of companies in the batch
 - For each company, the code will extract the list of employees
 - The results are displayed to the user in the web application

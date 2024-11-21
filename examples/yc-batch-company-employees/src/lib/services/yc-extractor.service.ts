@@ -11,7 +11,7 @@ import {
   type GetYcBatchesResponse,
   YC_COMPANIES_URL,
 } from "@/consts";
-import type { AirtopService } from "@/lib/airtop.service";
+import type { AirtopService } from "@/lib/services/airtop.service";
 import type { LogLayer } from "loglayer";
 
 /**
@@ -37,6 +37,8 @@ export class YCExtractorService {
    * @returns {Promise<string[]>} A promise that resolves to an array of batches
    */
   async getYcBatches(sessionId?: string): Promise<string[]> {
+    this.log.info("Initiating fetch to get YC batches");
+
     // Get session info if provided, otherwise create a new session
     const session = sessionId
       ? await this.airtop.client.sessions.getInfo(sessionId)
@@ -47,6 +49,7 @@ export class YCExtractorService {
       url: YC_COMPANIES_URL,
     });
 
+    this.log.info("Extracting YC batches");
     // Extract the batches from the YC Company Directory page
     const modelResponse = await this.airtop.client.windows.pageQuery(session.data.id, window.data.windowId, {
       prompt: GET_YC_BATCHES_PROMPT,
@@ -59,21 +62,30 @@ export class YCExtractorService {
       throw new Error("No batches found");
     }
 
-    const batches = JSON.parse(modelResponse.data.modelResponse) as GetYcBatchesResponse;
+    const response = JSON.parse(modelResponse.data.modelResponse) as GetYcBatchesResponse;
 
-    if (batches.error) {
-      throw new Error(batches.error);
+    if (response.error) {
+      throw new Error(response.error);
     }
 
-    return batches.batches;
+    this.log
+      .withMetadata({
+        batches: response.batches,
+      })
+      .info("Successfully fetched YC batches");
+
+    return response.batches;
   }
 
   /**
    * Gets the companies in a given Y Combinator batch.
    * @param {string} batch - The batch to get companies for
+   * @param {string} sessionId - The ID of the session
    * @returns {Promise<string[]>} A promise that resolves to an array of company names
    */
   async getCompaniesInBatch(batch: string, sessionId?: string): Promise<Company[]> {
+    this.log.info(`Initiating fetch to get companies in a Y Combinator batch "${batch}"`);
+
     const session = sessionId
       ? await this.airtop.client.sessions.getInfo(sessionId)
       : await this.airtop.createSession();
@@ -83,6 +95,7 @@ export class YCExtractorService {
       url: `${YC_COMPANIES_URL}?batch=${batch}`,
     });
 
+    this.log.info(`Extracting companies in batch "${batch}"`);
     const modelResponse = await this.airtop.client.windows.pageQuery(session.data.id, window.data.windowId, {
       prompt: GET_COMPANIES_IN_BATCH_PROMPT,
       configuration: {
@@ -100,6 +113,12 @@ export class YCExtractorService {
       throw new Error(response.error);
     }
 
+    this.log
+      .withMetadata({
+        companies: response.companies,
+      })
+      .info("Successfully fetched companies in batch");
+
     return response.companies;
   }
 
@@ -111,9 +130,16 @@ export class YCExtractorService {
   async getCompaniesLinkedInProfileUrls(companies: Company[]): Promise<string[]> {
     const companyLinks = companies.map((c) => c.link);
 
+    this.log.info("Getting LinkedIn profile URLs for companies");
     const companyLinkedInProfileUrls = await Promise.all(
       companyLinks.map(async (link) => this.getCompanyLinkedInProfileUrl(link)),
     );
+
+    this.log
+      .withMetadata({
+        linkedInProfileUrls: companyLinkedInProfileUrls,
+      })
+      .info("Successfully fetched LinkedIn profile urls for the companies");
 
     return companyLinkedInProfileUrls.filter(Boolean) as string[];
   }
@@ -129,6 +155,7 @@ export class YCExtractorService {
     let windowId: string | undefined;
 
     try {
+      this.log.info(`Creating session to get LinkedIn profile URL for ${companyLink}`);
       const session = await this.airtop.createSession();
       sessionId = session.data.id;
       const window = await this.airtop.client.windows.create(session.data.id, {
@@ -136,6 +163,7 @@ export class YCExtractorService {
       });
       windowId = window.data.windowId;
 
+      this.log.info(`Scraping for LinkedIn profile URL via ${companyLink}`);
       const modelResponse = await this.airtop.client.windows.pageQuery(session.data.id, window.data.windowId, {
         prompt: GET_COMPANY_LINKEDIN_PROFILE_URL_PROMPT,
         configuration: {
@@ -154,12 +182,20 @@ export class YCExtractorService {
       }
 
       return response.linkedInProfileUrl;
-    } catch (error) {
-      this.log.withMetadata({ sessionId, windowId }).error(`Error getting LinkedIn profile URL for ${companyLink}`);
+    } catch (error: any) {
+      this.log
+        .withError(error?.message ?? error)
+        .withMetadata({ sessionId, windowId })
+        .error(`Skipping LinkedIn profile URL for ${companyLink} due to an error`);
       return null;
     } finally {
-      await this.airtop.terminateWindow(windowId);
-      await this.airtop.terminateSession(sessionId);
+      if (windowId) {
+        await this.airtop.terminateWindow(windowId);
+      }
+
+      if (sessionId) {
+        await this.airtop.terminateSession(sessionId);
+      }
     }
   }
 }

@@ -4,7 +4,7 @@ import { getLogger, serializeErrors } from "@local/utils";
 import { type NextRequest, NextResponse } from "next/server";
 
 /**
- * Initializes the Airtop session and start the process of extracting data from YCombinator and LinkedIn.
+ * Initializes the Airtop session and start the process of extracting data from yCombinator and LinkedIn.
  * - Returns with a URL for the user to sign in via the live session if necessary
  * - Otherwise, will return with the extracted data
  */

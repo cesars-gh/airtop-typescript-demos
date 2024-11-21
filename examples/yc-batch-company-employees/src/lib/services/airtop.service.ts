@@ -1,19 +1,28 @@
 import { AirtopClient } from "@airtop/sdk";
 import type { SessionResponse, WindowIdResponse } from "@airtop/sdk/api";
+import type { LogLayer } from "loglayer";
 
 /**
- * Base service for interacting with Airtop.
+ * Service for interacting with the Airtop SDK.
  */
 export class AirtopService {
   client: AirtopClient;
-  savedSessions: SessionResponse[];
-  savedWindows: { sessionId: string; windowId: string }[];
+  savedSessions: Map<string, SessionResponse>;
+  savedWindows: Map<string, { sessionId: string; windowId: string }>;
+  log: LogLayer;
 
-  constructor({ apiKey }: { apiKey: string }) {
+  /**
+   * Creates a new instance of AirtopService.
+   * @param {Object} params - Configuration parameters
+   * @param {string} params.apiKey - Airtop API key
+   * @param {LogLayer} params.log - Logger instance for service operations
+   */
+  constructor({ apiKey, log }: { apiKey: string; log: LogLayer }) {
     this.client = new AirtopClient({ apiKey });
 
-    this.savedSessions = [];
-    this.savedWindows = [];
+    this.log = log;
+    this.savedSessions = new Map();
+    this.savedWindows = new Map();
   }
 
   /**
@@ -30,7 +39,7 @@ export class AirtopService {
       },
     });
 
-    this.savedSessions.push(session);
+    this.savedSessions.set(session.data.id, session);
 
     return session;
   }
@@ -44,25 +53,27 @@ export class AirtopService {
       return;
     }
 
-    const session = this.savedSessions.find((session) => session.data.id === sessionId);
+    const session = this.savedSessions.has(sessionId);
 
     if (!session) {
       return;
     }
 
+    this.log.info(`Terminating session: ${sessionId}`);
+
     // Terminate the session
     await this.client.sessions.terminate(sessionId);
 
-    // Remove the session from the list
-    const index = this.savedSessions.indexOf(session);
-    this.savedSessions.splice(index, 1);
+    this.savedSessions.delete(sessionId);
   }
 
   /**
    * Terminates all sessions.
    */
   async terminateAllSessions(): Promise<void> {
-    await Promise.all(this.savedSessions.map(async (session) => this.terminateSession(session.data.id)));
+    for (const [sessionId] of this.savedSessions) {
+      await this.terminateSession(sessionId);
+    }
   }
 
   /**
@@ -74,7 +85,7 @@ export class AirtopService {
   async createWindow(sessionId: string, url: string): Promise<WindowIdResponse> {
     const window = await this.client.windows.create(sessionId, { url });
 
-    this.savedWindows.push({ sessionId, windowId: window.data.windowId });
+    this.savedWindows.set(window.data.windowId, { sessionId, windowId: window.data.windowId });
 
     return window;
   }
@@ -88,24 +99,27 @@ export class AirtopService {
       return;
     }
 
-    const window = this.savedWindows.find((window) => window.windowId === windowId);
+    const window = this.savedWindows.get(windowId);
 
     if (!window) {
       return;
     }
 
+    this.log.info(`Terminating window: ${window.windowId}`);
+
     // Close the window
     await this.client.windows.close(window.sessionId, window.windowId);
 
     // Remove the window from the list
-    const index = this.savedWindows.indexOf(window);
-    this.savedWindows.splice(index, 1);
+    this.savedWindows.delete(windowId);
   }
 
   /**
    * Terminates all windows.
    */
   async terminateAllWindows(): Promise<void> {
-    await Promise.all(this.savedWindows.map(async (window) => this.terminateWindow(window.windowId)));
+    for (const [windowId] of this.savedWindows) {
+      await this.terminateWindow(windowId);
+    }
   }
 }

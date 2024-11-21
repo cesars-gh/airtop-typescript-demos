@@ -1,0 +1,8 @@
+{
+  "copyFiles": [
+    {
+      "from": "node_modules/@local/ui/public/**/*",
+      "to": "public"
+    }
+  ]
+}

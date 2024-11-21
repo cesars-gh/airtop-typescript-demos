@@ -77,6 +77,7 @@ export function BatchSelectorForm({ batches }: BatchSelectorFormProps) {
           <Button onClick={handleBatchSelect} disabled={!selectedBatch || isSubmitting}>
             {isSubmitting ? <ElapsedTime content="Fetching employee profiles..." /> : "Process Batch"}
           </Button>
+          <div className="italic">This operation will take a few minutes to complete.</div>
         </div>
       </CardContent>
     </Card>

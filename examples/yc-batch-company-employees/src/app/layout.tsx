@@ -9,7 +9,7 @@ const inter = Inter({ subsets: ["latin"], display: "swap" });
 
 export const metadata: Metadata = {
   title: "Airtop: YC Batch Company's Employees's Profiles",
-  description: "Extracts data from YCombinator and LinkedIn using the Airtop SDK",
+  description: "Extracts data from yCombinator and LinkedIn using the Airtop SDK",
 };
 
 export default async function RootLayout({ children }: PropsWithChildren) {

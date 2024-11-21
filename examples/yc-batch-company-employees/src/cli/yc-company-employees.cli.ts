@@ -1,6 +1,6 @@
-import { AirtopService } from "@/lib/airtop.service";
-import { LinkedInExtractorService } from "@/lib/linkedin-extractor.service";
-import { YCExtractorService } from "@/lib/yc-extractor.service";
+import { AirtopService } from "@/lib/services/airtop.service";
+import { LinkedInExtractorService } from "@/lib/services/linkedin-extractor.service";
+import { YCExtractorService } from "@/lib/services/yc-extractor.service";
 import type { SessionResponse } from "@airtop/sdk/api";
 import { confirm, input, select } from "@inquirer/prompts";
 import { getLogger } from "@local/utils";
@@ -22,7 +22,7 @@ async function cli() {
     required: false,
   });
 
-  const airtop = new AirtopService({ apiKey });
+  const airtop = new AirtopService({ apiKey, log });
 
   const ycService = new YCExtractorService({
     airtop,
@@ -55,7 +55,6 @@ async function cli() {
     log.info("This might take a while...");
 
     const linkedInProfileUrls = await ycService.getCompaniesLinkedInProfileUrls(companies.slice(0, 5));
-    log.withMetadata(linkedInProfileUrls).info("LinkedIn profile urls");
 
     linkedInSession = await linkedInService.airtop.createSession(profileId);
     log.withMetadata({ profileId: linkedInSession.data.profileId }).info("Profile id");
@@ -71,13 +70,8 @@ async function cli() {
     }
 
     const employeesListUrls = await linkedInService.getEmployeesListUrls(linkedInProfileUrls, linkedInSession.data.id);
-    log.withMetadata(employeesListUrls).info("Employees list urls");
 
-    const employeeProfileUrls = await linkedInService.getEmployeesProfileUrls(
-      employeesListUrls,
-      linkedInSession.data.id,
-    );
-    log.withMetadata(employeeProfileUrls).info("Employee profile urls");
+    await linkedInService.getEmployeesProfileUrls(employeesListUrls, linkedInSession.data.id);
 
     log.info("Extraction completed successfully");
   } finally {

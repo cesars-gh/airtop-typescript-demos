@@ -1,5 +1,5 @@
 import type { ContinueResponse } from "@/app/api/continue/continue.validation";
-import { getServices } from "@/lib/service-factory";
+import { getServices } from "@/lib/services";
 import type { LogLayer } from "loglayer";
 
 /**
@@ -25,12 +25,12 @@ export async function continueController({
   log,
   sessionId,
 }: ContinueControllerParams): Promise<ContinueResponse> {
-  // Initialize the YCombinator extractor service with API key and logging
-  const { YCombinator, airtop } = getServices(apiKey, log);
+  // Initialize the yCombinator extractor service with API key and logging
+  const { yCombinator, airtop } = getServices(apiKey, log);
 
   try {
     // Fetch YC batches
-    const batches = await YCombinator.getYcBatches(sessionId);
+    const batches = await yCombinator.getYcBatches(sessionId);
 
     return {
       sessionId,

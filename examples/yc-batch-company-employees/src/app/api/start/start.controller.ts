@@ -1,6 +1,6 @@
 import type { StartResponse } from "@/app/api/start/start.validation";
-import { getServices } from "@/lib/service-factory";
-import { YCExtractorService } from "@/lib/yc-extractor.service";
+import { getServices } from "@/lib/services";
+import { YCExtractorService } from "@/lib/services/yc-extractor.service";
 import type { LogLayer } from "loglayer";
 
 interface StartControllerParams {
@@ -36,7 +36,6 @@ export async function startController({ apiKey, log, profileId }: StartControlle
 
     // Fetch YC batches
     const batches = await service.getYcBatches(session.data.id);
-    log.withMetadata(batches).info("Successfully fetched YC batches");
 
     // Return the batches in the response
     return {
