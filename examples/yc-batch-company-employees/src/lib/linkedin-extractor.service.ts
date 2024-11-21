@@ -111,7 +111,11 @@ export class LinkedInExtractorService {
    * Terminates a session.
    * @param sessionId - The ID of the session to terminate
    */
-  async terminateSession(sessionId: string): Promise<void> {
+  async terminateSession(sessionId: string | undefined): Promise<void> {
+    if (!sessionId) {
+      return;
+    }
+
     await this.airtop.sessions.terminate(sessionId);
   }
 

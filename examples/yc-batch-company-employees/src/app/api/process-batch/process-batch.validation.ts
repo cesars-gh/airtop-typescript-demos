@@ -3,7 +3,7 @@ import { z } from "zod";
 export const processBatchRequestSchema = z.object({
   apiKey: z.string().describe("The API key to use for the request"),
   sessionId: z.string().describe("The id of the session to use"),
-  batch: z.string().describe("The YC batch to process"),
+  batch: z.string().describe("The YC batch to process. Ex: S24"),
 });
 
 export type ProcessBatchRequest = z.infer<typeof processBatchRequestSchema>;

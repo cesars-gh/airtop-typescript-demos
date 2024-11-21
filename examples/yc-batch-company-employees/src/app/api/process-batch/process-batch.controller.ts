@@ -56,9 +56,8 @@ export async function processBatchController({
       content: JSON.stringify(employeesProfileUrls, null, 2),
       signInRequired: false,
     };
-  } catch (error) {
-    // Clean up session if there's an error
+  } finally {
     await service.terminateSession(sessionId);
-    throw error;
+    log.info("Successfully terminated session");
   }
 }

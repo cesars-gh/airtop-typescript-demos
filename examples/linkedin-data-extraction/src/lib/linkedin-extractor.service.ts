@@ -36,6 +36,18 @@ export class LinkedInExtractorService {
   }
 
   /**
+   * Terminates a session.
+   * @param sessionId - The ID of the session to terminate
+   */
+  async terminateSession(sessionId: string | undefined): Promise<void> {
+    if (!sessionId) {
+      return;
+    }
+
+    await this.client.sessions.terminate(sessionId);
+  }
+
+  /**
    * Initializes a new browser session and window.
    * @param {string} [profileId] - Optional profile ID for session persistence
    * @returns {Promise<{session: any, windowInfo: any}>} Session and window information

@@ -24,35 +24,44 @@ async function cli() {
     log,
   });
 
-  const { session, windowInfo } = await service.initializeSessionAndBrowser(profileId);
+  let sessionAndWindow = undefined;
 
-  const isSignedIn = await service.checkIfSignedIntoLinkedIn({
-    sessionId: session.id,
-    windowId: windowInfo.data.windowId,
-  });
+  try {
+    sessionAndWindow = await service.initializeSessionAndBrowser(profileId);
+    const { session, windowInfo } = sessionAndWindow;
 
-  if (!isSignedIn) {
-    log.info("");
-    log.info(
-      chalk.blue("Sign-in to Linkedin is required, please sign-in to using this live view URL on your browser:"),
-    );
+    const isSignedIn = await service.checkIfSignedIntoLinkedIn({
+      sessionId: session.id,
+      windowId: windowInfo.data.windowId,
+    });
 
-    log.info(windowInfo.data.liveViewUrl);
-    log.info("");
+    if (!isSignedIn) {
+      log.info("");
+      log.info(
+        chalk.blue("Sign-in to Linkedin is required, please sign-in to using this live view URL on your browser:"),
+      );
 
-    await confirm({ message: "Press enter once you have signed in", default: true });
+      log.info(windowInfo.data.liveViewUrl);
+      log.info("");
+
+      await confirm({ message: "Press enter once you have signed in", default: true });
+    }
+
+    const content = await service.extractLinkedInData({
+      sessionId: session.id,
+      windowId: windowInfo.data.windowId,
+    });
+
+    const formattedJson = JSON.stringify(JSON.parse(content), null, 2);
+
+    log.info("Response:\n\n", chalk.green(formattedJson));
+
+    log.info("Extraction completed successfully");
+  } finally {
+    if (sessionAndWindow?.session) {
+      await service.terminateSession(sessionAndWindow.session.id);
+    }
   }
-
-  const content = await service.extractLinkedInData({
-    sessionId: session.id,
-    windowId: windowInfo.data.windowId,
-  });
-
-  const formattedJson = JSON.stringify(JSON.parse(content), null, 2);
-
-  log.info("Response:\n\n", chalk.green(formattedJson));
-
-  log.info("Extraction completed successfully");
 }
 
 cli().catch((e) => {
