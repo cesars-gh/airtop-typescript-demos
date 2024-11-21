@@ -40,32 +40,33 @@ async function cli() {
 
   const companies = await ycService.getCompaniesInBatch(selectedBatch, ycSession.data.id);
 
-  log.info("Companies:\n\n", chalk.green(JSON.stringify(companies, null, 2)));
+  log.withMetadata(companies).info("Companies");
 
-  log.info("Now we will extract the LinkedIn profile urls from the companies");
+  log.withMetadata(companies).info("Now we will extract the LinkedIn profile urls from the companies");
+
   log.info("This might take a while...");
 
   const linkedInProfileUrls = await ycService.getCompaniesLinkedInProfileUrls(companies.slice(0, 5));
-  log.info("LinkedIn profile urls:\n\n", chalk.green(JSON.stringify(linkedInProfileUrls, null, 2)));
+  log.withMetadata(linkedInProfileUrls).info("LinkedIn profile urls");
 
   const linkedInSession = await linkedInService.createSession(profileId);
-  log.info("Profile id: ", chalk.green(linkedInSession.data.profileId));
+  log.withMetadata({ profileId: linkedInSession.data.profileId }).info("Profile id");
 
   const isLoggedIn = await linkedInService.checkIfSignedIntoLinkedIn(linkedInSession.data.id);
 
   if (!isLoggedIn) {
     const linkedInLoginPageUrl = await linkedInService.getLinkedInLoginPageLiveViewUrl(linkedInSession.data.id);
 
-    log.info("Please sign in to LinkedIn using this URL:\n\n", chalk.blue(linkedInLoginPageUrl));
+    log.withMetadata({ linkedInLoginPageUrl }).info("Please sign in to LinkedIn using this URL");
 
     await confirm({ message: "Press enter once you have signed in", default: true });
   }
 
   const employeesListUrls = await linkedInService.getEmployeesListUrls(linkedInProfileUrls, linkedInSession.data.id);
-  log.info("Employees list urls:\n\n", chalk.green(JSON.stringify(employeesListUrls, null, 2)));
+  log.withMetadata(employeesListUrls).info("Employees list urls");
 
   const employeeProfileUrls = await linkedInService.getEmployeesProfileUrls(employeesListUrls, linkedInSession.data.id);
-  log.info("Employee profile urls:\n\n", chalk.green(JSON.stringify(employeeProfileUrls, null, 2)));
+  log.withMetadata(employeeProfileUrls).info("Employee profile urls");
 
   log.info("Extraction completed successfully");
 

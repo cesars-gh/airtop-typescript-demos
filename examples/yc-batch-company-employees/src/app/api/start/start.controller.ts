@@ -21,7 +21,7 @@ export async function startController({ apiKey, log, profileId }: StartControlle
 
     if (!isLoggedIn) {
       const liveViewUrl = await linkedInService.getLinkedInLoginPageLiveViewUrl(session.data.id);
-      log.info("User needs to login to LinkedIn, returning live view URL", liveViewUrl);
+      log.withMetadata({ liveViewUrl }).info("User needs to login to LinkedIn, returning live view URL");
 
       return {
         sessionId: session.data.id,
@@ -36,7 +36,7 @@ export async function startController({ apiKey, log, profileId }: StartControlle
 
     // Fetch YC batches
     const batches = await service.getYcBatches(session.data.id);
-    log.info("Successfully fetched YC batches", JSON.stringify(batches, null, 2));
+    log.withMetadata(batches).info("Successfully fetched YC batches");
 
     // Return the batches in the response
     return {

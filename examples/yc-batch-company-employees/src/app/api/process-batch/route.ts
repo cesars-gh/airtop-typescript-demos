@@ -11,7 +11,7 @@ export async function POST(request: NextRequest) {
   const log = getLogger().withPrefix("[api/process-batch]");
 
   const data = (await request.json()) as ProcessBatchRequest;
-  log.info("Validating request data", JSON.stringify(data, null, 2));
+  log.withMetadata(data).info("Validating request data");
 
   try {
     processBatchRequestSchema.parse(data);
