@@ -1,5 +1,5 @@
 import type { StartResponse } from "@/app/api/start/start.validation";
-import { LinkedInExtractorService } from "@/lib/linkedin-extractor.service";
+import { getServices } from "@/lib/service-factory";
 import { YCExtractorService } from "@/lib/yc-extractor.service";
 import type { LogLayer } from "loglayer";
 
@@ -11,16 +11,16 @@ interface StartControllerParams {
 
 export async function startController({ apiKey, log, profileId }: StartControllerParams): Promise<StartResponse> {
   // Initialize the LinkedIn extractor service
-  const linkedInService = new LinkedInExtractorService({ apiKey, log });
+  const { airtop, linkedin } = getServices(apiKey, log);
 
   // Create a new session
-  const session = await linkedInService.createSession(profileId);
+  const session = await linkedin.airtop.createSession(profileId);
 
   try {
-    const isLoggedIn = await linkedInService.checkIfSignedIntoLinkedIn(session.data.id);
+    const isLoggedIn = await linkedin.checkIfSignedIntoLinkedIn(session.data.id);
 
     if (!isLoggedIn) {
-      const liveViewUrl = await linkedInService.getLinkedInLoginPageLiveViewUrl(session.data.id);
+      const liveViewUrl = await linkedin.getLinkedInLoginPageLiveViewUrl(session.data.id);
       log.withMetadata({ liveViewUrl }).info("User needs to login to LinkedIn, returning live view URL");
 
       return {
@@ -32,7 +32,7 @@ export async function startController({ apiKey, log, profileId }: StartControlle
     }
 
     // Initialize the YC extractor service
-    const service = new YCExtractorService({ apiKey, log });
+    const service = new YCExtractorService({ airtop, log });
 
     // Fetch YC batches
     const batches = await service.getYcBatches(session.data.id);
@@ -47,7 +47,8 @@ export async function startController({ apiKey, log, profileId }: StartControlle
     };
   } catch (error) {
     // Clean up session if there's an error
-    await linkedInService.terminateSession(session.data.id);
+    await airtop.terminateAllWindows();
+    await airtop.terminateSession(session.data.id);
     throw error;
   }
 }

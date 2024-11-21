@@ -1,3 +1,4 @@
+import { AirtopService } from "@/lib/airtop.service";
 import { LinkedInExtractorService } from "@/lib/linkedin-extractor.service";
 import { YCExtractorService } from "@/lib/yc-extractor.service";
 import type { SessionResponse } from "@airtop/sdk/api";
@@ -21,13 +22,15 @@ async function cli() {
     required: false,
   });
 
+  const airtop = new AirtopService({ apiKey });
+
   const ycService = new YCExtractorService({
-    apiKey,
+    airtop,
     log,
   });
 
   const linkedInService = new LinkedInExtractorService({
-    apiKey,
+    airtop,
     log,
   });
 
@@ -35,7 +38,7 @@ async function cli() {
   let linkedInSession: SessionResponse | undefined;
 
   try {
-    ycSession = await ycService.createSession();
+    ycSession = await ycService.airtop.createSession();
     const batches = await ycService.getYcBatches(ycSession.data.id);
 
     const selectedBatch = await select({
@@ -54,7 +57,7 @@ async function cli() {
     const linkedInProfileUrls = await ycService.getCompaniesLinkedInProfileUrls(companies.slice(0, 5));
     log.withMetadata(linkedInProfileUrls).info("LinkedIn profile urls");
 
-    linkedInSession = await linkedInService.createSession(profileId);
+    linkedInSession = await linkedInService.airtop.createSession(profileId);
     log.withMetadata({ profileId: linkedInSession.data.profileId }).info("Profile id");
 
     const isLoggedIn = await linkedInService.checkIfSignedIntoLinkedIn(linkedInSession.data.id);
@@ -79,8 +82,8 @@ async function cli() {
     log.info("Extraction completed successfully");
   } finally {
     // Cleanup
-    await linkedInService.terminateSession(linkedInSession?.data.id);
-    await ycService.terminateSession(ycSession?.data.id);
+    await airtop.terminateAllWindows();
+    await airtop.terminateAllSessions();
   }
 
   process.exit(0);

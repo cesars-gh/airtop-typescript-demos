@@ -1,25 +1,23 @@
 import { IS_LOGGED_IN_OUTPUT_SCHEMA, IS_LOGGED_IN_PROMPT, type IsLoggedInResponse, LINKEDIN_FEED_URL } from "@/consts";
-import { AirtopService } from "@/lib/airtop.service";
-import type { SessionResponse, WindowIdResponse } from "@airtop/sdk/api";
+import type { AirtopService } from "@/lib/airtop.service";
 import type { LogLayer } from "loglayer";
 
 /**
  * Service for extracting data from LinkedIn.
  */
-export class LinkedInExtractorService extends AirtopService {
+export class LinkedInExtractorService {
   log: LogLayer;
-  windows: WindowIdResponse[];
+  airtop: AirtopService;
 
   /**
    * Creates a new instance of LinkedInExtractorService.
    * @param {Object} params - Configuration parameters
-   * @param {string} params.apiKey - API key for Airtop client authentication
+   * @param {AirtopService} params.airtop - Airtop client
    * @param {LogLayer} params.log - Logger instance for service operations
    */
-  constructor({ apiKey, log }: { apiKey: string; log: LogLayer }) {
-    super({ apiKey });
+  constructor({ airtop, log }: { airtop: AirtopService; log: LogLayer }) {
+    this.airtop = airtop;
     this.log = log;
-    this.windows = [];
   }
 
   /**
@@ -90,40 +88,14 @@ export class LinkedInExtractorService extends AirtopService {
   }
 
   /**
-   * Creates a new session.
-   * @param profileId - The ID of the profile to use for the session
-   * @returns The created session
-   */
-  async createSession(profileId?: string): Promise<SessionResponse> {
-    const session = await this.airtop.sessions.create({
-      configuration: {
-        timeoutMinutes: 15,
-        persistProfile: Boolean(!profileId), // Only persist a new profile if we do not have an existing profileId
-        ...(profileId ? { baseProfileId: profileId } : {}),
-      },
-    });
-
-    return session;
-  }
-
-  /**
-   * Terminates windows associated with a session.
-   */
-  async terminateWindows(sessionId: string, windowIds: string[]): Promise<void> {
-    await Promise.all(windowIds.map(async (windowId) => this.airtop.windows.close(sessionId, windowId)));
-  }
-
-  /**
    * Checks if the user is signed into LinkedIn
    * @param sessionId - The ID of the session
    * @returns Whether the user is signed into LinkedIn
    */
   async checkIfSignedIntoLinkedIn(sessionId: string): Promise<boolean> {
-    const window = await this.airtop.windows.create(sessionId, {
-      url: LINKEDIN_FEED_URL,
-    });
+    const window = await this.airtop.createWindow(sessionId, LINKEDIN_FEED_URL);
 
-    const modelResponse = await this.airtop.windows.pageQuery(sessionId, window.data.windowId, {
+    const modelResponse = await this.airtop.client.windows.pageQuery(sessionId, window.data.windowId, {
       prompt: IS_LOGGED_IN_PROMPT,
       configuration: {
         outputSchema: IS_LOGGED_IN_OUTPUT_SCHEMA,
@@ -146,19 +118,16 @@ export class LinkedInExtractorService extends AirtopService {
    * @returns The list of LinkedIn employees list URLs
    */
   async getEmployeesListUrls(companyLinkedInProfileUrls: string[], sessionId: string): Promise<string[]> {
-    const windowsToClose: string[] = [];
-
     const employeesListUrls = await this.processBatchedUrls(companyLinkedInProfileUrls, async (url) => {
       let windowId: string | null = null;
       try {
-        const companyProfileWindow = await this.airtop.windows.create(sessionId, {
-          url,
-        });
-
+        const companyProfileWindow = await this.airtop.createWindow(sessionId, url);
         windowId = companyProfileWindow.data.windowId;
-        windowsToClose.push(windowId);
 
-        const scrapedContent = await this.airtop.windows.scrapeContent(sessionId, windowId);
+        const scrapedContent = await this.airtop.client.windows.scrapeContent(
+          sessionId,
+          companyProfileWindow.data.windowId,
+        );
 
         return this.extractEmployeeListUrl(scrapedContent.data.modelResponse.scrapedContent.text);
       } catch (error) {
@@ -170,7 +139,7 @@ export class LinkedInExtractorService extends AirtopService {
       }
     });
 
-    await this.terminateWindows(sessionId, windowsToClose);
+    await this.airtop.terminateAllWindows();
 
     // Filter out any null values and remove duplicates
     return [...new Set(employeesListUrls.filter((url) => url !== null))];
@@ -183,21 +152,15 @@ export class LinkedInExtractorService extends AirtopService {
    * @returns The list of LinkedIn employees profile URLs
    */
   async getEmployeesProfileUrls(employeesListUrls: string[], sessionId: string): Promise<string[]> {
-    const windowsToClose: string[] = [];
-
     const employeesProfileUrls = await this.processBatchedUrls(employeesListUrls, async (url) => {
-      const window = await this.airtop.windows.create(sessionId, {
-        url,
-      });
+      const window = await this.airtop.createWindow(sessionId, url);
 
-      windowsToClose.push(window.data.windowId);
-
-      const scrapedContent = await this.airtop.windows.scrapeContent(sessionId, window.data.windowId);
+      const scrapedContent = await this.airtop.client.windows.scrapeContent(sessionId, window.data.windowId);
 
       return this.extractEmployeeProfileUrls(scrapedContent.data.modelResponse.scrapedContent.text);
     });
 
-    await this.terminateWindows(sessionId, windowsToClose);
+    await this.airtop.terminateAllWindows();
 
     return employeesProfileUrls.flat();
   }
@@ -208,11 +171,9 @@ export class LinkedInExtractorService extends AirtopService {
    * @returns The LinkedIn login page Live View URL
    */
   async getLinkedInLoginPageLiveViewUrl(sessionId: string): Promise<string> {
-    const linkedInWindow = await this.airtop.windows.create(sessionId, {
-      url: LINKEDIN_FEED_URL,
-    });
+    const linkedInWindow = await this.airtop.createWindow(sessionId, LINKEDIN_FEED_URL);
 
-    const windowInfo = await this.airtop.windows.getWindowInfo(sessionId, await linkedInWindow.data.windowId);
+    const windowInfo = await this.airtop.client.windows.getWindowInfo(sessionId, await linkedInWindow.data.windowId);
 
     return windowInfo.data.liveViewUrl;
   }

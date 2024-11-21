@@ -1,5 +1,5 @@
 import type { ContinueResponse } from "@/app/api/continue/continue.validation";
-import { YCExtractorService } from "@/lib/yc-extractor.service";
+import { getServices } from "@/lib/service-factory";
 import type { LogLayer } from "loglayer";
 
 /**
@@ -26,18 +26,19 @@ export async function continueController({
   sessionId,
 }: ContinueControllerParams): Promise<ContinueResponse> {
   // Initialize the YCombinator extractor service with API key and logging
-  const service = new YCExtractorService({ apiKey, log });
+  const { YCombinator, airtop } = getServices(apiKey, log);
 
   try {
     // Fetch YC batches
-    const batches = await service.getYcBatches(sessionId);
+    const batches = await YCombinator.getYcBatches(sessionId);
 
     return {
       sessionId,
       batches: batches,
     };
   } catch (error) {
-    await service.terminateSession(sessionId);
+    await airtop.terminateAllWindows();
+    await airtop.terminateSession(sessionId);
     throw error;
   }
 }
