@@ -5,6 +5,7 @@
   "type": "module",
   "private": true,
   "scripts": {
+    "clean": "rm -rf .turbo .next node_modules",
     "dev": "next dev --turbopack",
     "build": "next build",
     "start": "next start",

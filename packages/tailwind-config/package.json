@@ -12,6 +12,7 @@
     }
   },
   "scripts": {
+    "clean": "rm -rf .turbo node_modules dist .hashes.json",
     "build:dev": "hash-runner",
     "build": "rm -rf dist && tsc",
     "lint": "biome check --write --unsafe src && biome format src --write && biome lint src --fix",

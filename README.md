@@ -27,6 +27,13 @@ You should now be able to try out the examples in this repository which are loca
 
 See the `README.md` in each example project for more information on how to run the example.
 
+## Development
+
+It's recommended to have two terminals opened:
+
+- One that runs `turbo watch build:packages` so that the shared packages are built automatically on changes.
+- Another that runs the example you are working on using `pnpm dev`
+
 ## Tools used
 
 Most examples use the following:
