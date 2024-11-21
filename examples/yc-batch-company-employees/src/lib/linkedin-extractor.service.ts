@@ -1,13 +1,12 @@
 import { IS_LOGGED_IN_OUTPUT_SCHEMA, IS_LOGGED_IN_PROMPT, type IsLoggedInResponse, LINKEDIN_FEED_URL } from "@/consts";
-import { AirtopClient } from "@airtop/sdk";
+import { AirtopService } from "@/lib/airtop.service";
 import type { SessionResponse, WindowIdResponse } from "@airtop/sdk/api";
 import type { LogLayer } from "loglayer";
 
 /**
  * Service for extracting data from LinkedIn.
  */
-export class LinkedInExtractorService {
-  airtop: AirtopClient;
+export class LinkedInExtractorService extends AirtopService {
   log: LogLayer;
   windows: WindowIdResponse[];
 
@@ -18,7 +17,7 @@ export class LinkedInExtractorService {
    * @param {LogLayer} params.log - Logger instance for service operations
    */
   constructor({ apiKey, log }: { apiKey: string; log: LogLayer }) {
-    this.airtop = new AirtopClient({ apiKey });
+    super({ apiKey });
     this.log = log;
     this.windows = [];
   }
@@ -105,18 +104,6 @@ export class LinkedInExtractorService {
     });
 
     return session;
-  }
-
-  /**
-   * Terminates a session.
-   * @param sessionId - The ID of the session to terminate
-   */
-  async terminateSession(sessionId: string | undefined): Promise<void> {
-    if (!sessionId) {
-      return;
-    }
-
-    await this.airtop.sessions.terminate(sessionId);
   }
 
   /**

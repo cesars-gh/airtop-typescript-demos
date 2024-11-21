@@ -11,15 +11,14 @@ import {
   type GetYcBatchesResponse,
   YC_COMPANIES_URL,
 } from "@/consts";
-import { AirtopClient } from "@airtop/sdk";
+import { AirtopService } from "@/lib/airtop.service";
 import type { SessionResponse } from "@airtop/sdk/api";
 import type { LogLayer } from "loglayer";
 
 /**
  * Service for extracting data from Y Combinator.
  */
-export class YCExtractorService {
-  airtop: AirtopClient;
+export class YCExtractorService extends AirtopService {
   log: LogLayer;
   sessions: SessionResponse[];
 
@@ -30,7 +29,7 @@ export class YCExtractorService {
    * @param {LogLayer} params.log - Logger instance for service operations
    */
   constructor({ apiKey, log }: { apiKey: string; log: LogLayer }) {
-    this.airtop = new AirtopClient({ apiKey });
+    super({ apiKey });
     this.log = log;
     this.sessions = [];
   }
@@ -61,7 +60,7 @@ export class YCExtractorService {
       return;
     }
 
-    await this.airtop.sessions.terminate(sessionId);
+    await super.terminateSession(sessionId);
     this.sessions = this.sessions.filter((session) => session.data.id !== sessionId);
   }
 
@@ -69,7 +68,7 @@ export class YCExtractorService {
    * Terminates all active sessions.
    */
   async terminateAllSessions(): Promise<void> {
-    await Promise.all(this.sessions.map(async (session) => this.airtop.sessions.terminate(session.data.id)));
+    await Promise.all(this.sessions.map(async (session) => this.terminateSession(session.data.id)));
     this.sessions = [];
   }
 
