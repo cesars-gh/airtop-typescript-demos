@@ -2,11 +2,12 @@
   "name": "@local/utils",
   "description": "Common utilities for Airtop demos",
   "version": "1.0.0",
-  "type": "module",
   "private": true,
   "exports": {
     ".": {
-      "import": "./dist/index.js"
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "default": "./dist/index.js"
     },
     "./api/terminate-session/*.js": "./dist/api/terminate-session/*.js"
   },
