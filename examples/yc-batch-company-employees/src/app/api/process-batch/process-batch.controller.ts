@@ -25,7 +25,7 @@ export async function processBatchController({
     log.withMetadata(companies).info("Successfully fetched companies in batch");
 
     // Get LinkedIn profile urls for the companies
-    const linkedInProfileUrls = await service.getCompaniesLinkedInProfileUrls(companies.slice(0, 2));
+    const linkedInProfileUrls = await service.getCompaniesLinkedInProfileUrls(companies);
     log.withMetadata(linkedInProfileUrls).info("Successfully fetched LinkedIn profile urls for the companies");
 
     const isLoggedIn = await linkedInService.checkIfSignedIntoLinkedIn(sessionId);
