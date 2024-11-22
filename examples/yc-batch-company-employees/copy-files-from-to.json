@@ -1,8 +1,12 @@
 {
   "copyFiles": [
     {
-      "from": "node_modules/@local/ui/public/**/*",
+      "from": "node_modules/@local/ui/assets/public/**/*",
       "to": "public"
+    },
+    {
+      "from": "node_modules/@local/ui/assets/app/**/*",
+      "to": "src/app"
     }
   ]
 }

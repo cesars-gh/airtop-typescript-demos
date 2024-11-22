@@ -3,14 +3,12 @@ import { Inter } from "next/font/google";
 import type { PropsWithChildren } from "react";
 
 import "./globals.css";
+import { exampleListings } from "@internal/home-config";
 import { Body } from "@local/ui";
 
 const inter = Inter({ subsets: ["latin"], display: "swap" });
 
-export const metadata: Metadata = {
-  title: "Airtop: LinkedIn Data Extraction",
-  description: "Extracts data from LinkedIn using the Airtop SDK",
-};
+export const metadata: Metadata = exampleListings.LINKEDIN_DATA_EXTRACTION.metadata;
 
 export default async function RootLayout({ children }: PropsWithChildren) {
   return (

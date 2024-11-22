@@ -3,14 +3,12 @@ import { Inter } from "next/font/google";
 import type { PropsWithChildren } from "react";
 
 import "./globals.css";
+import { exampleListings } from "@internal/home-config";
 import { Body } from "@local/ui";
 
 const inter = Inter({ subsets: ["latin"], display: "swap" });
 
-export const metadata: Metadata = {
-  title: "Airtop: YC Batch Company's Employees's Profiles",
-  description: "Extracts data from yCombinator and LinkedIn using the Airtop SDK",
-};
+export const metadata: Metadata = exampleListings.YC_BATCH_COMPANY_EMPLOYEES.metadata;
 
 export default async function RootLayout({ children }: PropsWithChildren) {
   return (

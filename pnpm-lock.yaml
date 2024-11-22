@@ -47,16 +47,49 @@ importers:
       '@internal/home-config':
         specifier: workspace:*
         version: link:../../packages/home-config
+      '@local/ui':
+        specifier: workspace:*
+        version: link:../../packages/ui
+      '@local/utils':
+        specifier: workspace:*
+        version: link:../../packages/utils
+      class-variance-authority:
+        specifier: 0.7.0
+        version: 0.7.0
+      clsx:
+        specifier: 2.1.1
+        version: 2.1.1
+      lucide-react:
+        specifier: 0.460.0
+        version: 0.460.0(react@19.0.0-rc-66855b96-20241106)
       next:
         specifier: 15.0.3
         version: 15.0.3(react-dom@19.0.0-rc-66855b96-20241106(react@19.0.0-rc-66855b96-20241106))(react@19.0.0-rc-66855b96-20241106)
+      next-themes:
+        specifier: 0.4.3
+        version: 0.4.3(react-dom@19.0.0-rc-66855b96-20241106(react@19.0.0-rc-66855b96-20241106))(react@19.0.0-rc-66855b96-20241106)
       react:
         specifier: 19.0.0-rc-66855b96-20241106
         version: 19.0.0-rc-66855b96-20241106
       react-dom:
         specifier: 19.0.0-rc-66855b96-20241106
         version: 19.0.0-rc-66855b96-20241106(react@19.0.0-rc-66855b96-20241106)
+      tailwind-merge:
+        specifier: 2.5.4
+        version: 2.5.4
+      tailwindcss-animate:
+        specifier: 1.0.7
+        version: 1.0.7(tailwindcss@3.4.15)
+      zod:
+        specifier: 3.23.8
+        version: 3.23.8
     devDependencies:
+      '@local/tailwind-config':
+        specifier: workspace:*
+        version: link:../../packages/tailwind-config
+      '@local/typescript-config':
+        specifier: workspace:*
+        version: link:../../packages/typescript-config
       '@types/node':
         specifier: 22.9.0
         version: 22.9.0
@@ -66,6 +99,15 @@ importers:
       '@types/react-dom':
         specifier: 18.3.1
         version: 18.3.1
+      copy-files-from-to:
+        specifier: 3.12.0
+        version: 3.12.0
+      postcss:
+        specifier: 8.4.49
+        version: 8.4.49
+      tailwindcss:
+        specifier: 3.4.15
+        version: 3.4.15
       typescript:
         specifier: 5.6.3
         version: 5.6.3
