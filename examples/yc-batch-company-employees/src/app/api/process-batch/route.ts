@@ -7,6 +7,8 @@ import {
 import { getLogger, serializeErrors } from "@local/utils";
 import { type NextRequest, NextResponse } from "next/server";
 
+export const maxDuration = 300;
+
 export async function POST(request: NextRequest) {
   const log = getLogger().withPrefix("[api/process-batch]");
 

@@ -3,6 +3,8 @@ import { type StartRequest, type StartResponse, startRequestSchema } from "@/app
 import { getLogger, serializeErrors } from "@local/utils";
 import { type NextRequest, NextResponse } from "next/server";
 
+export const maxDuration = 300;
+
 /**
  * Initializes the Airtop session and start the process of extracting data from LinkedIn.
  * - Returns with a URL for the user to sign in via the live session if necessary

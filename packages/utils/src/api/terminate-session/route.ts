@@ -7,6 +7,8 @@ import {
 import { getLogger } from "@/logging.js";
 import { type NextRequest, NextResponse } from "next/server.js";
 
+export const maxDuration = 60;
+
 /**
  * Terminates an Airtop session.
  */
