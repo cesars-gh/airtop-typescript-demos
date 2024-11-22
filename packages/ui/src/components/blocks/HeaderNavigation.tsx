@@ -1,6 +1,10 @@
 import { Book, Github } from "lucide-react";
 
-export function HeaderNavigation() {
+interface HeaderNavigationProps {
+  exampleDirName?: string;
+}
+
+export function HeaderNavigation({ exampleDirName }: HeaderNavigationProps) {
   return (
     <div className="flex justify-between items-center mt-6">
       <div className="flex-shrink-0 flex items-center">
@@ -26,7 +30,11 @@ export function HeaderNavigation() {
           <Book />
         </a>
         <a
-          href="https://github.com/airtop-ai/examples"
+          href={
+            exampleDirName
+              ? `https://github.com/airtop-ai/examples/tree/main/examples/${exampleDirName}`
+              : "https://github.com/airtop-ai/examples"
+          }
           target="_blank"
           rel="noopener noreferrer"
           className="hover:opacity-80"

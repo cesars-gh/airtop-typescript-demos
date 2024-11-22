@@ -20,7 +20,7 @@ export default async function RootLayout({ children }: PropsWithChildren) {
           type="text/css"
         />
       </head>
-      <Body>{children}</Body>
+      <Body exampleDirName={exampleListings.YC_BATCH_COMPANY_EMPLOYEES.dirName}>{children}</Body>
     </html>
   );
 }
