@@ -84,7 +84,7 @@ export class YCExtractorService {
    * @returns {Promise<string[]>} A promise that resolves to an array of company names
    */
   async getCompaniesInBatch(batch: string, sessionId?: string): Promise<Company[]> {
-    this.log.info(`Initiating fetch to get companies in a Y Combinator batch "${batch}"`);
+    this.log.info(`Initiating fetch to get companies in Y Combinator batch "${batch}"`);
 
     const session = sessionId
       ? await this.airtop.client.sessions.getInfo(sessionId)

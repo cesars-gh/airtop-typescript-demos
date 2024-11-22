@@ -1,11 +1,8 @@
-import type { ProcessBatchResponse } from "@/app/api/process-batch/process-batch.validation";
+import type { ProcessBatchRequest, ProcessBatchResponse } from "@/app/api/process-batch/process-batch.validation";
 import { getServices } from "@/lib/services";
 import type { LogLayer } from "loglayer";
 
-interface ProcessBatchControllerParams {
-  apiKey: string;
-  sessionId: string;
-  batch: string;
+interface ProcessBatchControllerParams extends ProcessBatchRequest {
   log: LogLayer;
 }
 
@@ -13,6 +10,7 @@ export async function processBatchController({
   apiKey,
   sessionId,
   batch,
+  parallelism,
   log,
 }: ProcessBatchControllerParams): Promise<ProcessBatchResponse> {
   const { airtop, yCombinator, linkedin } = getServices(apiKey, log);
@@ -38,10 +36,18 @@ export async function processBatchController({
     }
 
     // Get employee list url for each company
-    const employeesListUrls = await linkedin.getEmployeesListUrls(linkedInProfileUrls, sessionId);
+    const employeesListUrls = await linkedin.getEmployeesListUrls({
+      companyLinkedInProfileUrls: linkedInProfileUrls,
+      sessionId: sessionId,
+      parallelism,
+    });
 
     // Get employee's Profile Urls for each employee list url
-    const employeesProfileUrls = await linkedin.getEmployeesProfileUrls(employeesListUrls, sessionId);
+    const employeesProfileUrls = await linkedin.getEmployeesProfileUrls({
+      employeesListUrls: employeesListUrls,
+      sessionId: sessionId,
+      parallelism,
+    });
 
     log.info("*** Batch operation completed, returning response to client ***");
 

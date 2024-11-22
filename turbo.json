@@ -10,12 +10,14 @@
     "build": {
       "dependsOn": ["^build"],
       "inputs": ["$TURBO_DEFAULT$", ".env*"],
-      "outputs": [".next/**", "!.next/cache/**", "dist/**"]
+      "outputs": [".next/**", "!.next/cache/**", "dist/**"],
+      "cache": false
     },
     "build:packages": {
       "dependsOn": ["^build"],
       "inputs": ["packages/**"],
-      "outputs": ["packages/**/dist/**"]
+      "outputs": ["packages/**/dist/**"],
+      "cache": false
     },
     "verify-types": {
       "dependsOn": ["^verify-types"]

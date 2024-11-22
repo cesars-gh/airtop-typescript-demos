@@ -59,7 +59,7 @@ export class AirtopService {
       return;
     }
 
-    this.log.info(`Terminating session: ${sessionId}`);
+    this.log.debug(`Terminating session: ${sessionId}`);
 
     // Terminate the session
     await this.client.sessions.terminate(sessionId);
@@ -105,7 +105,7 @@ export class AirtopService {
       return;
     }
 
-    this.log.info(`Terminating window: ${window.windowId}`);
+    this.log.debug(`Terminating window: ${window.windowId}`);
 
     // Close the window
     await this.client.windows.close(window.sessionId, window.windowId);

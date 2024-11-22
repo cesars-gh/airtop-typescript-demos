@@ -22,6 +22,21 @@ async function cli() {
     required: false,
   });
 
+  const parallelism = Number.parseInt(
+    await input({
+      message: "Enter the number of parallel sessions to run:",
+      default: "1",
+      required: true,
+      validate: (input) => {
+        if (Number.isNaN(input) || Number.parseInt(input) < 1) {
+          return "Please enter a valid number greater than 0";
+        }
+
+        return true;
+      },
+    }),
+  );
+
   const airtop = new AirtopService({ apiKey, log });
 
   const ycService = new YCExtractorService({
@@ -48,8 +63,6 @@ async function cli() {
 
     const companies = await ycService.getCompaniesInBatch(selectedBatch, ycSession.data.id);
 
-    log.withMetadata(companies).info("Companies");
-
     log.withMetadata(companies).info("Now we will extract the LinkedIn profile urls from the companies");
 
     log.info("This might take a while...");
@@ -64,16 +77,27 @@ async function cli() {
     if (!isLoggedIn) {
       const linkedInLoginPageUrl = await linkedInService.getLinkedInLoginPageLiveViewUrl(linkedInSession.data.id);
 
-      log.withMetadata({ linkedInLoginPageUrl }).info("Please sign in to LinkedIn using this URL");
+      log.info("Please sign in to LinkedIn using this live view URL in your browser:");
+      log.info(linkedInLoginPageUrl);
 
       await confirm({ message: "Press enter once you have signed in", default: true });
+
+      log.info("You can now close the browser tab for the live view. The extraction will continue in the background.");
     }
 
-    const employeesListUrls = await linkedInService.getEmployeesListUrls(linkedInProfileUrls, linkedInSession.data.id);
+    const employeesListUrls = await linkedInService.getEmployeesListUrls({
+      companyLinkedInProfileUrls: linkedInProfileUrls,
+      sessionId: linkedInSession.data.id,
+      parallelism,
+    });
 
-    await linkedInService.getEmployeesProfileUrls(employeesListUrls, linkedInSession.data.id);
+    await linkedInService.getEmployeesProfileUrls({
+      employeesListUrls: employeesListUrls,
+      sessionId: linkedInSession.data.id,
+      parallelism,
+    });
 
-    log.info("Extraction completed successfully");
+    log.info("*** Operation finished ***");
   } finally {
     // Cleanup
     await airtop.terminateAllWindows();
