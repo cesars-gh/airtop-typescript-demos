@@ -1,8 +1,8 @@
-import { exampleListings, registerToHome} from "@internal/home-config";
+import {exampleListings, registerToHome} from "@internal/home-config";
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  ...registerToHome(exampleListings.LINKEDIN_DATA_EXTRACTION.dirName),
+  ...registerToHome(exampleListings.YC_BATCH_COMPANY_EMPLOYEES.dirName),
   eslint: {
     // Warning: This allows production builds to successfully complete even if
     // your project has ESLint errors.

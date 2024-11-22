@@ -8,7 +8,7 @@ import { Body } from "@local/ui";
 
 const inter = Inter({ subsets: ["latin"], display: "swap" });
 
-export const metadata: Metadata = exampleListings.LINKEDIN_DATA_EXTRACTION.metadata;
+export const metadata: Metadata = exampleListings.YC_BATCH_COMPANY_EMPLOYEES.metadata;
 
 export default async function RootLayout({ children }: PropsWithChildren) {
   return (

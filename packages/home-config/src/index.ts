@@ -1,28 +1,58 @@
-export enum EXAMPLES_DIRS {
-  LINKEDIN_DATA_EXTRACTION = "linkedin-data-extraction",
+export interface ExampleListing {
+  dirName: string;
+  metadata: {
+    title: string;
+    description: string;
+  };
 }
 
-export const registerToHome = (exampleName: EXAMPLES_DIRS) => {
+export enum ExampleSite {
+  LINKEDIN_DATA_EXTRACTION = "LINKEDIN_DATA_EXTRACTION",
+  YC_BATCH_COMPANY_EMPLOYEES = "YC_BATCH_COMPANY_EMPLOYEES",
+}
+
+export const exampleListings: Record<ExampleSite, ExampleListing> = {
+  [ExampleSite.LINKEDIN_DATA_EXTRACTION]: {
+    dirName: "linkedin-data-extraction",
+    metadata: {
+      title: "Airtop: LinkedIn Data Extraction",
+      description: "Extracts data from LinkedIn profiles",
+    },
+  },
+  [ExampleSite.YC_BATCH_COMPANY_EMPLOYEES]: {
+    dirName: "yc-batch-company-employees",
+    metadata: {
+      title: "Airtop: YC Batch Company's Employees's Profiles",
+      description: "Extracts employees from YC batch companies",
+    },
+  },
+};
+
+export const registerToHome = (dirName: string) => {
   return {
-    assetPrefix: `/${exampleName}-static`,
+    assetPrefix: `/${dirName}-static`,
   };
 };
 
-export const getHomeConfig = (exampleName: EXAMPLES_DIRS) => {
-  const url = `https://${exampleName}.examples.airtop.dev`;
+export const getAppUrl = (dirName: string) => {
+  return `https://${dirName}.examples.airtop.dev`;
+};
+
+export const getHomeConfig = (dirName: string) => {
+  const url = getAppUrl(dirName);
 
   return [
     {
-      source: `/${exampleName}`,
+      source: `/${dirName}`,
       destination: url,
     },
     {
-      source: `/${exampleName}/:path*`,
+      source: `/${dirName}/:path*`,
       destination: `${url}/:path*`,
     },
     {
-      source: `/${exampleName}-static/:path*`,
-      destination: `${url}/${exampleName}-static/:path*`,
+      source: `/${dirName}-static/:path*`,
+      destination: `${url}/${dirName}-static/:path*`,
     },
   ];
 };
