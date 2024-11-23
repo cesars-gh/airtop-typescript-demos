@@ -1,7 +1,7 @@
 import { z } from "zod";
 
 export const terminateSessionRequestSchema = z.object({
-  apiKey: z.string().describe("The API key to use for the request"),
+  apiKey: z.string().min(10).describe("The API key to use for the request"),
   sessionId: z.string().describe("The id of the session to terminate"),
 });
 
