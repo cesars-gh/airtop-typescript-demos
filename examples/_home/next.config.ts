@@ -5,8 +5,8 @@ const nextConfig: NextConfig = {
   async rewrites() {
     const rewrites = [];
 
-    for (const exampleName of Object.values(exampleListings.YC_BATCH_COMPANY_EMPLOYEES.dirName)) {
-      rewrites.push(...getHomeConfig(exampleName));
+    for (const example of Object.values(exampleListings)) {
+      rewrites.push(...getHomeConfig(example.dirName));
     }
 
     return rewrites;
