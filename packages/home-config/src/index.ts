@@ -39,7 +39,7 @@ export const getAppUrl = (dirName: string) => {
 };
 
 export const getHomeConfig = (dirName: string) => {
-  const url = getAppUrl(dirName);
+  const url = `https://${dirName}.examples.airtop.dev`;
 
   return [
     {
@@ -55,4 +55,22 @@ export const getHomeConfig = (dirName: string) => {
       destination: `${url}/${dirName}-static/:path*`,
     },
   ];
+};
+
+export const getHeadersConfig = () => {
+  return {
+    async headers() {
+      return [
+        {
+          // matching all API routes
+          source: "/api/:path*",
+          headers: [
+            { key: "Access-Control-Allow-Credentials", value: "true" },
+            { key: "Access-Control-Allow-Origin", value: "*" },
+            { key: "Access-Control-Allow-Methods", value: "GET,OPTIONS,PATCH,DELETE,POST,PUT" },
+          ],
+        },
+      ];
+    },
+  };
 };

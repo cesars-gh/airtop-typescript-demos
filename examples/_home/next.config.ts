@@ -1,7 +1,8 @@
-import { exampleListings, getHomeConfig } from "@internal/home-config";
+import {exampleListings, getHeadersConfig, getHomeConfig} from "@internal/home-config";
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
+  ...getHeadersConfig(),
   async rewrites() {
     const rewrites = [];
 
