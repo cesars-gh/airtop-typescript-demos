@@ -19,10 +19,6 @@ function getCookieSettings() {
     path: "/",
   };
 
-  if (serverEnvs.cookieDomain && process.env.NODE_ENV === "production") {
-    cookieOptions.domain = serverEnvs.cookieDomain;
-  }
-
   if (process.env.NODE_ENV === "development") {
     cookieOptions.secure = false;
     cookieOptions.domain = "localhost";

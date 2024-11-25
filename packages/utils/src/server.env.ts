@@ -4,10 +4,6 @@ export const serverEnvs = {
    */
   cookieSecret: process.env.EXAMPLES_SITES_COOKIE_SECRET as string,
   /**
-   * The domain to set the session cookie on.
-   */
-  cookieDomain: process.env.COOKIE_DOMAIN as string,
-  /**
    * If true, enables generating the API key from the Airtop Portal and passing
    * it back to the example site to store into a cookie
    */
