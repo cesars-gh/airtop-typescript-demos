@@ -3,6 +3,7 @@
 import type { ContinueRequest, ContinueResponse } from "@/app/api/continue/continue.validation";
 import { useAppStore } from "@/store";
 import { Button, ElapsedTime, useHandleError, useTerminateSession } from "@local/ui";
+import { getFetchBasePath } from "@local/utils";
 import { useCallback, useState } from "react";
 
 /**
@@ -34,7 +35,7 @@ export function ContinueForm() {
     setIsSubmitting(true);
 
     try {
-      const response = await fetch("/api/continue", {
+      const response = await fetch(`${getFetchBasePath()}/api/continue`, {
         method: "POST",
         body: JSON.stringify({
           apiKey,

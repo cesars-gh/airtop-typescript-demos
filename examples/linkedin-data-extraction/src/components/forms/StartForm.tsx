@@ -16,6 +16,7 @@ import {
   Input,
   useHandleError,
 } from "@local/ui";
+import { getFetchBasePath } from "@local/utils";
 import type React from "react";
 import { useCallback } from "react";
 import { useForm } from "react-hook-form";
@@ -45,7 +46,7 @@ export function StartForm() {
   const onSubmit = useCallback(
     async (data: StartRequest) => {
       try {
-        const response = await fetch("/api/start", {
+        const response = await fetch(`${getFetchBasePath()}/api/start`, {
           method: "POST",
           body: JSON.stringify(data),
         });

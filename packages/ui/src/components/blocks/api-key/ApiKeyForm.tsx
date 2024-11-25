@@ -4,6 +4,7 @@ import { Form, FormControl, FormField, FormItem, FormMessage } from "@/component
 import { Button } from "@/components/ui/button.jsx";
 import { Input } from "@/components/ui/input.jsx";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { getFetchBasePath } from "@local/utils";
 import { type SetApiKeyRequest, setApiKeyRequestSchema } from "@local/utils/api/api-key/set-api-key.validation.js";
 import type React from "react";
 import { useCallback } from "react";
@@ -35,7 +36,7 @@ export function ApiKeyForm({
   const onApiKeySubmit = useCallback(
     async (data: SetApiKeyRequest) => {
       try {
-        const response = await fetch("/api/api-key", {
+        const response = await fetch(`${getFetchBasePath()}/api/api-key`, {
           method: currentApiKey ? "DELETE" : "POST",
           body: JSON.stringify(data),
         });

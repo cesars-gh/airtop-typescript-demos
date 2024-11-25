@@ -1,4 +1,5 @@
 import { useHandleError } from "@/hooks/use-handle-error.js";
+import { getFetchBasePath } from "@local/utils";
 import { useCallback } from "react";
 
 /**
@@ -21,7 +22,7 @@ export function useTerminateSession({
     }
 
     try {
-      const response = await fetch("/api/terminate-session", {
+      const response = await fetch(`${getFetchBasePath()}/api/terminate-session`, {
         method: "POST",
         body: JSON.stringify({
           apiKey,
