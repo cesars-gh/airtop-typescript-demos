@@ -7,8 +7,6 @@ export const AIRTOP_SESSION_COOKIE_NAME = "airtop-session";
 export interface AirtopSessionCookie {
   // The API key for the user
   apiKey?: string;
-  // CSRF for form submissions
-  csrf?: string;
 }
 
 function getCookieSettings() {
@@ -39,20 +37,4 @@ export async function getApiKeyFromCookie() {
   const session = await getCookieSession();
 
   return session.apiKey;
-}
-
-export async function getCsrfFromCookie() {
-  const session = await getCookieSession();
-
-  return session.csrf;
-}
-
-export async function generateCsrfCookie() {
-  const session = await getCookieSession();
-
-  session.csrf = Math.random().toString(36).substring(2);
-
-  await session.save();
-
-  return session.csrf;
 }

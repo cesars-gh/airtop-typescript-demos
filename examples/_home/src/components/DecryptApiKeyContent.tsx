@@ -28,11 +28,11 @@ export function DecryptApiKeyContent({ csrf }: DecryptApiKeyContentProps) {
             method: "POST",
             headers: {
               "Content-Type": "application/json",
+              "x-csrf-token": csrf,
             },
             body: JSON.stringify({
               secret: data.secret,
               nonce: data.nonce,
-              csrf,
             }),
           })
             .then((response) => {

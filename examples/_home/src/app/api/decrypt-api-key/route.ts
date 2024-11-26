@@ -20,7 +20,7 @@ export async function POST(request: NextRequest) {
   const data = (await request.json()) as DecryptApiKeyRequest;
   log.withMetadata(data).info("Validating request data");
 
-  if (!csrf || csrf !== data.csrf) {
+  if (!csrf?.trim() || csrf !== data.csrf?.trim()) {
     return NextResponse.json(
       {
         error: "Invalid CSRF token",

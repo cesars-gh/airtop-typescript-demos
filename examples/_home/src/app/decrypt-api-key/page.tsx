@@ -1,5 +1,5 @@
 import { DecryptApiKeyContent } from "@/components/DecryptApiKeyContent";
-import { generateCsrfCookie } from "@local/utils";
+import { headers } from "next/headers";
 
 /**
  * This page is used to set the API key in the session cookie.
@@ -9,7 +9,8 @@ import { generateCsrfCookie } from "@local/utils";
  * session cookie.
  */
 export default async function ApiKeyPage() {
-  const csrf = await generateCsrfCookie();
+  const h = await headers();
+  const csrfToken = h.get("X-CSRF-Token") || "missing";
 
-  return <DecryptApiKeyContent csrf={csrf} />;
+  return <DecryptApiKeyContent csrf={csrfToken} />;
 }
