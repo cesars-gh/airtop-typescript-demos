@@ -62,6 +62,14 @@ This only needs to be performed once for new examples.
 - For each environment variable listed, in `Link to Projects`, select the project you just deployed > `Save`
 - Re-deploy the project by going to the project > `Deployments` > `Redeploy` on the current deployment
 
+### Assigning the domain name
+
+- Go to the project > `Settings` > `Domains` > `<your dir name>.examples.airtop.dev` > `Add`
+
+Then your project should be accessible via `https://examples.airtop.ai/<your dir name>`.
+
+**Note this is `airtop.ai` not `airtop.dev` because of how we store cookies**.
+
 ## Before a commit
 
 - `package.json` dependencies should be pinned to the exact version. 
