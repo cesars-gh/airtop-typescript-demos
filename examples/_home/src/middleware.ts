@@ -4,6 +4,9 @@ import { createCsrfMiddleware } from "@edge-csrf/nextjs";
 const csrfMiddleware = createCsrfMiddleware({
   cookie: {
     secure: process.env.NODE_ENV === "production",
+    sameSite: "strict",
+    path: "/",
+    httpOnly: true,
   },
 });
 
