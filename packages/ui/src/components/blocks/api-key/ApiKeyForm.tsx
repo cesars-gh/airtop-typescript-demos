@@ -75,6 +75,7 @@ export function ApiKeyForm({ onError, onSuccess, currentApiKey, onRequestNewKey 
                 <FormControl>
                   <Input
                     {...field}
+                    className="mb-1"
                     readOnly={!!currentApiKey}
                     placeholder="Your Airtop API key"
                     type="text"
