@@ -47,7 +47,7 @@ export const getAppUrl = (dirName: string) => {
 };
 
 export const getHomeConfig = (dirName: string) => {
-  const url = `https://${dirName}.examples.airtop.ai`;
+  const url = `https://${dirName}.examples.airtop.dev`;
 
   return [
     {
