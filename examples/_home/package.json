@@ -13,7 +13,6 @@
     "postinstall": "copy-files-from-to"
   },
   "dependencies": {
-    "@edge-csrf/nextjs": "2.5.3-cloudflare-rc1",
     "@internal/home-config": "workspace:*",
     "@local/ui": "workspace:*",
     "@local/utils": "workspace:*",

@@ -4,11 +4,7 @@ import { useEffect } from "react";
 
 const AIRTOP_PORTAL_URL = process.env.NEXT_PUBLIC_AIRTOP_PORTAL_URL;
 
-interface DecryptApiKeyContentProps {
-  csrf: string;
-}
-
-export function DecryptApiKeyContent({ csrf }: DecryptApiKeyContentProps) {
+export function DecryptApiKeyContent() {
   useEffect(() => {
     // Handle incoming messages from parent window
     const handleMessage = (event: MessageEvent) => {
@@ -33,7 +29,6 @@ export function DecryptApiKeyContent({ csrf }: DecryptApiKeyContentProps) {
             body: JSON.stringify({
               secret: data.secret,
               nonce: data.nonce,
-              csrf_token: csrf,
             }),
           })
             .then((response) => {
@@ -60,7 +55,7 @@ export function DecryptApiKeyContent({ csrf }: DecryptApiKeyContentProps) {
     return () => {
       window.removeEventListener("message", handleMessage);
     };
-  }, [csrf]);
+  }, []);
 
   return <div />;
 }
