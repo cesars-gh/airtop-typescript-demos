@@ -43,11 +43,11 @@ export const registerToHome = (dirName: string) => {
 };
 
 export const getAppUrl = (dirName: string) => {
-  return `https://examples.airtop.dev/${dirName}`;
+  return `https://examples.airtop.ai/${dirName}`;
 };
 
 export const getHomeConfig = (dirName: string) => {
-  const url = `https://${dirName}.examples.airtop.dev`;
+  const url = `https://${dirName}.examples.airtop.ai`;
 
   return [
     {
