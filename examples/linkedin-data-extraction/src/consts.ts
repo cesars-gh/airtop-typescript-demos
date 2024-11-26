@@ -21,7 +21,7 @@ export const IS_LOGGED_IN_OUTPUT_SCHEMA = {
   },
 };
 
-export const TARGET_URL = "https://www.linkedin.com/in/daniel-motta-901a5728b/";
+export const TARGET_URL = "https://www.linkedin.com/in/amirashkenazi/";
 
 export const EXTRACT_DATA_PROMPT = `Given the LinkedIn profile URL, extract the following information:
 Job Information: Include all past and present job titles, company names, dates of employment, job descriptions, and locations.

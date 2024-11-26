@@ -126,7 +126,6 @@ export class LinkedInExtractorService {
 
     const promptContentResponse = await this.client.windows.pageQuery(sessionId, windowId, {
       prompt: EXTRACT_DATA_PROMPT,
-      followPaginationLinks: true, // This will tell the agent to load additional results via pagination links or scrolling
       configuration: {
         outputSchema: EXTRACT_DATA_OUTPUT_SCHEMA,
       },
