@@ -12,7 +12,7 @@ export interface AirtopSessionCookie {
 function getCookieSettings() {
   const cookieOptions: Record<string, any> = {
     secure: true,
-    sameSite: "strict",
+    sameSite: "none",
     httpOnly: true,
     path: "/",
   };

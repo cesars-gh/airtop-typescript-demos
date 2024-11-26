@@ -29,6 +29,7 @@ export function DecryptApiKeyContent({ csrf }: DecryptApiKeyContentProps) {
             headers: {
               "Content-Type": "application/json",
             },
+            credentials: "include",
             body: JSON.stringify({
               secret: data.secret,
               nonce: data.nonce,
