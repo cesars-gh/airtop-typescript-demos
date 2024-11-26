@@ -2,7 +2,7 @@ import { serverEnvs } from "@/server.env.js";
 import { getIronSession } from "iron-session";
 import { cookies } from "next/headers.js";
 
-export const AIRTOP_SESSION_COOKIE_NAME = "airtop-session";
+export const AIRTOP_SESSION_COOKIE_NAME = "airtop-examples-session";
 
 export interface AirtopSessionCookie {
   // The API key for the user
@@ -14,9 +14,10 @@ export interface AirtopSessionCookie {
 function getCookieSettings() {
   const cookieOptions: Record<string, any> = {
     secure: true,
-    sameSite: "strict",
+    sameSite: "lax",
     httpOnly: true,
     path: "/",
+    domain: ".airtop.ai",
   };
 
   if (process.env.NODE_ENV === "development") {
@@ -50,7 +51,9 @@ export async function getCsrfFromCookie() {
 export async function generateCsrfCookie() {
   const session = await getCookieSession();
 
-  session.csrf = Math.random().toString(36).substring(2);
+  if (!session.csrf) {
+    session.csrf = Math.random().toString(36).substring(2);
+  }
 
   await session.save();
 

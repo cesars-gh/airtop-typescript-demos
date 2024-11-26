@@ -18,7 +18,8 @@ export async function POST(request: NextRequest) {
   const csrf = await getCsrfFromCookie();
 
   const data = (await request.json()) as DecryptApiKeyRequest;
-  log.withMetadata(data).info("Validating request data");
+
+  log.info("Validating request data");
 
   if (!csrf?.trim() || csrf !== data.csrf?.trim()) {
     return NextResponse.json(
@@ -43,6 +44,7 @@ export async function POST(request: NextRequest) {
     const session = await getCookieSession();
 
     session.apiKey = apiKey;
+    session.csrf = "";
 
     await session.save();
 

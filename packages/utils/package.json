@@ -11,7 +11,8 @@
       "default": "./dist/index.js"
     },
     "./api/terminate-session/*.js": "./dist/api/terminate-session/*.js",
-    "./api/api-key/*.js": "./dist/api/api-key/*.js"
+    "./api/api-key/*.js": "./dist/api/api-key/*.js",
+    "./cookies.js": "./dist/cookies.js"
   },
   "author": "",
   "keywords": [],
