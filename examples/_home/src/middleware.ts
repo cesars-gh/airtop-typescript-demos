@@ -7,6 +7,7 @@ const csrfMiddleware = createCsrfMiddleware({
     sameSite: "none",
     path: "/",
     httpOnly: true,
+    partitioned: process.env.NODE_ENV === "production",
   },
 });
 
