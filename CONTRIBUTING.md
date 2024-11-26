@@ -65,10 +65,9 @@ This only needs to be performed once for new examples.
 ### Assigning the domain name
 
 - Go to the project > `Settings` > `Domains` > `<your dir name>.examples.airtop.dev` > `Add`
-
-Then your project should be accessible via `https://examples.airtop.ai/<your dir name>`.
-
-**Note this is `airtop.ai` not `airtop.dev` because of how we store cookies**.
+  * Make sure it is `.examples.airtop.dev` (the `.dev` part is important here)
+- Then your project should be accessible via `https://examples.airtop.ai/<your dir name>`.
+  * This is `examples.airtop.ai` (the `.ai` part is imporatnt here)
 
 ## Before a commit
 
