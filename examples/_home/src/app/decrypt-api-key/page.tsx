@@ -1,5 +1,6 @@
 import { DecryptApiKeyContent } from "@/components/DecryptApiKeyContent";
 import { getCsrfFromCookie } from "@local/utils";
+import { cookies } from "next/headers";
 
 /**
  * This page is used to set the API key in the session cookie.
@@ -9,7 +10,8 @@ import { getCsrfFromCookie } from "@local/utils";
  * session cookie.
  */
 export default async function ApiKeyPage() {
-  const csrf = await getCsrfFromCookie();
+  const nextCookies = await cookies();
+  const csrf = await getCsrfFromCookie(nextCookies);
 
   if (!csrf) {
     throw new Error("Could not get CSRF from cookie.");

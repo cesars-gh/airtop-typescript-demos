@@ -1,3 +1,5 @@
+import type { Header } from "next/dist/lib/load-custom-routes.js";
+
 export interface ExampleListing {
   dirName: string;
   metadata: {
@@ -65,7 +67,7 @@ export const getHomeConfig = (dirName: string) => {
   ];
 };
 
-export const getHeadersConfig = () => {
+export const getHeadersConfig = (additionalHeaders: Array<Header> = []) => {
   return {
     async headers() {
       return [
@@ -78,6 +80,7 @@ export const getHeadersConfig = () => {
             { key: "Access-Control-Allow-Methods", value: "GET,OPTIONS,PATCH,DELETE,POST,PUT" },
           ],
         },
+        ...additionalHeaders,
       ];
     },
   };

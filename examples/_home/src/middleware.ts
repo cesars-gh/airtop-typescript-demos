@@ -1,12 +1,14 @@
 import { generateCsrfCookie } from "@local/utils/cookies.js";
+import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 
 export async function middleware(request: NextRequest) {
   // Check if the path matches /decrypt-api-key
   if (request.nextUrl.pathname === "/decrypt-api-key") {
+    const nextCookies = await cookies();
     // Generate CSRF cookie
-    await generateCsrfCookie();
+    await generateCsrfCookie(nextCookies);
 
     // Return the response with the cookie
     return NextResponse.next();

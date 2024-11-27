@@ -5,6 +5,7 @@ import {
   decryptApiKeyRequestSchema,
 } from "@/app/api/decrypt-api-key/decrypt-api-key.validation";
 import { getCookieSession, getCsrfFromCookie, getLogger } from "@local/utils";
+import { cookies } from "next/headers";
 import { type NextRequest, NextResponse } from "next/server";
 
 const secret = process.env.EXAMPLES_SITES_COOKIE_SECRET as string;
@@ -14,8 +15,9 @@ const secret = process.env.EXAMPLES_SITES_COOKIE_SECRET as string;
  */
 export async function POST(request: NextRequest) {
   const log = getLogger().withPrefix("[api/decrypt-api-key]");
+  const nextCookies = await cookies();
 
-  const csrf = await getCsrfFromCookie();
+  const csrf = await getCsrfFromCookie(nextCookies);
 
   const data = (await request.json()) as DecryptApiKeyRequest;
 
@@ -40,8 +42,7 @@ export async function POST(request: NextRequest) {
     decryptApiKeyRequestSchema.parse(data);
 
     const { apiKey } = await decryptApiKeyController({ log, ...data });
-
-    const session = await getCookieSession();
+    const session = await getCookieSession(nextCookies);
 
     session.apiKey = apiKey;
     session.csrf = "";

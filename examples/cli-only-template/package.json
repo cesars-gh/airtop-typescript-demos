@@ -7,7 +7,6 @@
   "scripts": {
     "clean": "rm -rf .turbo .next node_modules",
     "cli": "NODE_OPTIONS=\"--no-deprecation\" tsx ./src/linkedin-data-extraction.cli.ts",
-    "build": "pnpm run lint && next build",
     "lint": "biome check --write --unsafe src && biome format src --write && biome lint src --fix",
     "verify-types": "tsc --project tsconfig.json --noEmit"
   },
