@@ -14,7 +14,13 @@ export default async function ApiKeyPage() {
   const csrf = await getCsrfFromCookie(nextCookies);
 
   if (!csrf) {
-    throw new Error("Could not get CSRF from cookie.");
+    // Regenerate the csrf token and redirect to the decrypt-api-key page
+    return {
+      redirect: {
+        destination: "/decrypt-api-key",
+        permanent: false,
+      },
+    };
   }
 
   return <DecryptApiKeyContent csrf={csrf} />;
