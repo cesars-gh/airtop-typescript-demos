@@ -1,6 +1,7 @@
 import { DecryptApiKeyContent } from "@/components/DecryptApiKeyContent";
 import { getCsrfFromCookie } from "@local/utils";
 import { cookies } from "next/headers";
+import { redirect } from "next/navigation";
 
 /**
  * This page is used to set the API key in the session cookie.
@@ -14,13 +15,7 @@ export default async function ApiKeyPage() {
   const csrf = await getCsrfFromCookie(nextCookies);
 
   if (!csrf) {
-    // Regenerate the csrf token and redirect to the decrypt-api-key page
-    return {
-      redirect: {
-        destination: "/decrypt-api-key",
-        permanent: false,
-      },
-    };
+    return redirect("/decrypt-api-key");
   }
 
   return <DecryptApiKeyContent csrf={csrf} />;
