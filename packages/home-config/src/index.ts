@@ -13,6 +13,7 @@ export enum ExampleSite {
   YC_BATCH_COMPANY_EMPLOYEES = "YC_BATCH_COMPANY_EMPLOYEES",
   CUSTOMER_REVIEWS = "CUSTOMER_REVIEWS",
   SIMPLE_INTERACTIONS = "SIMPLE_INTERACTIONS",
+  SOCIAL_MEDIA_LISTENING = "SOCIAL_MEDIA_LISTENING",
 }
 
 export const exampleListings: Record<ExampleSite, ExampleListing> = {
@@ -42,6 +43,13 @@ export const exampleListings: Record<ExampleSite, ExampleListing> = {
     metadata: {
       title: "Airtop: Simple Browser Interactions",
       description: "Simple interactions with the browser",
+    },
+  },
+  [ExampleSite.SOCIAL_MEDIA_LISTENING]: {
+    dirName: "social-media-listening",
+    metadata: {
+      title: "Airtop: Social Media Listening",
+      description: "Monitor and comment in posts you're interested in",
     },
   },
 };
