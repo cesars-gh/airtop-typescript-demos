@@ -22,7 +22,7 @@ export const IS_LOGGED_IN_OUTPUT_SCHEMA = zodToJsonSchema(
 
 // Posts extraction prompt & schema
 export const EXTRACT_POSTS_PROMPT = `
-  This is the X feed. Please extract up to {REASULT_LIMIT} posts that match the criteria,
+  This is the X feed. Please extract the first {REASULT_LIMIT} posts that match the criteria,
   extract the URL to the post, the post content and indicate if it makes sense to reply to the post
   based on the criteria below.
 
