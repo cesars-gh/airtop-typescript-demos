@@ -1,8 +1,8 @@
 import { useAppStore } from "@/store";
 import { Button } from "@local/ui";
 import { useTerminateSession } from "@local/ui";
-import { useCallback, useState } from "react";
 import { Loader2 } from "lucide-react";
+import { useCallback, useState } from "react";
 
 export function TerminateSession() {
   const sessionContext = useAppStore((state) => state.sessionContext);
