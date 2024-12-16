@@ -10,7 +10,7 @@ export async function processBatchController({
   apiKey,
   sessionId,
   batch,
-  parallelism,
+  profileId,
   log,
 }: ProcessBatchControllerParams): Promise<ProcessBatchResponse> {
   const { airtop, yCombinator, linkedin } = getServices(apiKey, log);
@@ -22,31 +22,19 @@ export async function processBatchController({
     // Get LinkedIn profile urls for the companies
     const linkedInProfileUrls = await yCombinator.getCompaniesLinkedInProfileUrls(companies);
 
-    const isLoggedIn = await linkedin.checkIfSignedIntoLinkedIn(sessionId);
-
-    // If LinkedIn auth is needed, return the live view URL
-    if (!isLoggedIn) {
-      const liveViewUrl = await linkedin.getLinkedInLoginPageLiveViewUrl(sessionId);
-      return {
-        sessionId,
-        content: "",
-        signInRequired: true,
-        liveViewUrl,
-      };
-    }
+    // At this point we should be logged in, so we terminate the session to persist profile
+    await airtop.terminateSession(sessionId);
 
     // Get employee list url for each company
     const employeesListUrls = await linkedin.getEmployeesListUrls({
       companyLinkedInProfileUrls: linkedInProfileUrls,
-      sessionId: sessionId,
-      parallelism,
+      profileId,
     });
 
     // Get employee's Profile Urls for each employee list url
     const employeesProfileUrls = await linkedin.getEmployeesProfileUrls({
       employeesListUrls: employeesListUrls,
-      sessionId: sessionId,
-      parallelism,
+      profileId,
     });
 
     log.info("*** Batch operation completed, returning response to client ***");
@@ -57,8 +45,17 @@ export async function processBatchController({
       content: JSON.stringify(employeesProfileUrls, null, 2),
       signInRequired: false,
     };
+  } catch (err) {
+    log.withError(err).error("Failed to extract LinkedIn data");
+
+    return {
+      sessionId,
+      content: "",
+    };
   } finally {
-    await airtop.terminateAllWindows();
-    await airtop.terminateAllSessions();
+    log.debug("Final cleanup");
+    airtop.terminateSession(sessionId).catch((e) => {
+      log.error(`Error occurred in final cleanup: ${e}`);
+    });
   }
 }
