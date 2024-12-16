@@ -55,7 +55,7 @@ export const exampleListings: Record<ExampleSite, ExampleListing> = {
     dirName: "social-media-listening",
     metadata: {
       title: "Airtop: Social Media Listening",
-      description: "Monitor and comment in posts you're interested in",
+      description: "Monitor and comment in posts of your interest.",
     },
   },
 };

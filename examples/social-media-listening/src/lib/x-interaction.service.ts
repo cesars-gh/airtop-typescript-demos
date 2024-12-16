@@ -6,116 +6,106 @@ import {
   INITIAL_URL,
   IS_LOGGED_IN_OUTPUT_SCHEMA,
   IS_LOGGED_IN_PROMPT,
-  RESULT_LIMIT,
   SCREEN_RESOLUTION,
-  SEARCH_URL,
   type TExtractedPostResult,
   type TGeneratedReplyResult,
+  type TIsLoggedInResult,
   type TPost,
-  sleep,
 } from "@/consts";
+import { sleep, trimPrompt } from "@/utils";
 import { AirtopClient } from "@airtop/sdk";
-import type { AiPromptResponse, SessionResponse, WindowResponse } from "@airtop/sdk/api";
+import type { SessionResponse, WindowResponse } from "@airtop/sdk/api";
 import chalk from "chalk";
 import type { LogLayer } from "loglayer";
 
-interface SessionContext {
-  session: SessionResponse["data"];
-  windowInfo: WindowResponse["data"] & { targetId: string };
-}
-/**
- * Service for interacting with Google Finance data using the Airtop client.
- */
-export class XInteractionService {
-  client: AirtopClient;
-  log: LogLayer;
+interface XInteractionServiceConfig {
   apiKey: string;
-  /**
-   * Creates a new instance of InteractionsService.
-   * @param {Object} params - Configuration parameters
-   * @param {string} params.apiKey - API key for Airtop client authentication
-   * @param {LogLayer} params.log - Logger instance for service operations
-   */
-  constructor({
-    apiKey,
-    log,
-  }: {
-    apiKey: string;
-    log: LogLayer;
-    ticker?: string;
-  }) {
-    this.apiKey = apiKey;
-    this.client = new AirtopClient({
-      apiKey,
-    });
+  log: LogLayer;
+}
+
+interface SearchPostsParams {
+  sessionId: string;
+  windowId: string;
+  query: string;
+  matchPrompt: string;
+  resultLimit: number;
+}
+
+interface GenerateReplyParams {
+  sessionId: string;
+  windowId: string;
+  postLink: string;
+  replyPrompt: string;
+}
+
+interface SendReplyParams {
+  sessionId: string;
+  windowId: string;
+  reply: string;
+}
+
+export interface SessionContext {
+  session: SessionResponse["data"];
+  windowInfo: WindowResponse["data"];
+}
+
+export class XInteractionService {
+  private readonly client: AirtopClient;
+  private readonly log: LogLayer;
+
+  constructor({ apiKey, log }: XInteractionServiceConfig) {
+    this.client = new AirtopClient({ apiKey });
     this.log = log;
   }
 
-  /**
-   * Terminates a session.
-   * @param sessionId - The ID of the session to terminate
-   */
-  async terminateSession(sessionId: string | undefined): Promise<void> {
-    if (!sessionId) {
-      return;
-    }
+  async initializeSessionAndBrowser(profileId?: string): Promise<SessionContext> {
+    this.log.info("Initializing new session");
 
-    this.log.info(chalk.yellow("Terminating session"));
-    await this.client.sessions.terminate(sessionId);
+    const session = await this.createSession(profileId);
+    const windowInfo = await this.createBrowserWindow(session.id);
+
+    return { session, windowInfo };
   }
 
-  /**
-   * Initialize a new browser session and window.
-   * @param {string} [profileId] - Optional profile ID for session persistence
-   * @returns {Promise<{session: any, windowInfo: any}>} Session and window information
-   */
-  async initializeSessionAndBrowser(profileId?: string): Promise<SessionContext> {
-    this.log.info("Creating a new session");
+  private async createSession(profileId?: string) {
     const sessionResponse = await this.client.sessions.create({
       configuration: {
         timeoutMinutes: 10,
-        persistProfile: !profileId, // Only persist a new profile if we do not have an existing profileId
+        persistProfile: !profileId,
         baseProfileId: profileId,
       },
     });
 
     const session = sessionResponse.data;
-
-    this.log.info("Created session: ", session.id);
-    this.log.info("Profile Id: ", profileId || session.profileId);
+    this.log.info(`Created session: ${session.id}, Profile Id: ${profileId || session.profileId}`);
 
     if (!session.cdpWsUrl) {
-      throw new Error("Unable to get cdp url");
+      throw new Error("CDP URL not available");
     }
 
-    this.log.info("Creating browser window");
-    const windowResponse = await this.client.windows.create(session.id, { url: INITIAL_URL });
+    return session;
+  }
 
-    this.log.info("Getting browser window info");
-    const wInfo = await this.client.windows.getWindowInfo(session.id, windowResponse.data.windowId, {
+  private async createBrowserWindow(sessionId: string) {
+    this.log.info("Creating browser window");
+    const windowResponse = await this.client.windows.create(sessionId, { url: INITIAL_URL });
+
+    const windowInfo = await this.client.windows.getWindowInfo(sessionId, windowResponse.data.windowId, {
       screenResolution: `${SCREEN_RESOLUTION.width}x${SCREEN_RESOLUTION.height}`,
       disableResize: true,
     });
 
-    return {
-      session,
-      // windowInfo: wInfo.data,
-      windowInfo: {
-        ...wInfo.data,
-        targetId: windowResponse.data.targetId,
-      },
-    };
+    return windowInfo.data;
   }
 
-  /**
-   * Check if the user is currently signed into the target website.
-   * @param {Object} params - Parameters for checking login status
-   * @param {string} params.sessionId - Active session ID
-   * @param {string} params.windowId - Active window ID
-   * @returns {Promise<boolean>} Whether the user is logged in
-   */
-  async checkIfSignedIntoWebsite({ sessionId, windowId }: { sessionId: string; windowId: string }): Promise<boolean> {
-    this.log.info("Determining whether the user is logged in or not...");
+  async checkIfSignedIntoWebsite({
+    sessionId,
+    windowId,
+  }: {
+    sessionId: string;
+    windowId: string;
+  }): Promise<boolean> {
+    this.log.info("Determining whether the user is logged in...");
     const isLoggedInPromptResponse = await this.client.windows.pageQuery(sessionId, windowId, {
       prompt: IS_LOGGED_IN_PROMPT,
       configuration: {
@@ -123,55 +113,46 @@ export class XInteractionService {
       },
     });
 
-    const parsedResponse = JSON.parse(isLoggedInPromptResponse.data.modelResponse);
+    const parsedResponse = JSON.parse(isLoggedInPromptResponse.data.modelResponse) as TIsLoggedInResult;
 
     if (parsedResponse.error) {
-      throw new Error(parsedResponse.error);
+      this.handleErrors([parsedResponse.error], "Error checking if the user is logged in");
     }
 
     return parsedResponse.isLoggedIn;
   }
 
-  // search posts
-  async searchPosts({
-    sessionContext,
-    query,
-    matchPrompt,
-  }: { sessionContext: SessionContext; query: string; matchPrompt: string }): Promise<TPost[]> {
-    const { session, windowInfo } = sessionContext;
-    const sessionId = session.id;
-    const windowId = windowInfo.windowId;
-    // Navigate to the target URL
-    this.log.info(`Navigating to ${SEARCH_URL}`);
-    await this.client.windows.loadUrl(sessionId, windowId, { url: SEARCH_URL, waitUntil: "domContentLoaded" });
+  async searchPosts({ sessionId, windowId, query, matchPrompt, resultLimit }: SearchPostsParams): Promise<TPost[]> {
+    const encodedQuery = encodeURIComponent(query);
+    const searchUrl = `https://x.com/search?q=${encodedQuery}&f=live`;
 
-    // Workaround for the page not being fully loaded
-    await sleep(2000);
+    await this.navigateToSearch(sessionId, windowId, searchUrl);
+    return this.extractPosts(sessionId, windowId, matchPrompt, resultLimit);
+  }
 
-    const typingAction = await this.client.windows.type(sessionId, windowId, {
-      elementDescription: "Search input at the top",
-      text: query,
-      pressEnterKey: true,
+  private async navigateToSearch(sessionId: string, windowId: string, url: string): Promise<void> {
+    this.log.info(`Navigating to ${url}`);
+    await this.client.windows.loadUrl(sessionId, windowId, {
+      url,
+      waitUntil: "domContentLoaded",
     });
+    await sleep(2000); // Wait for dynamic content to load
+  }
 
-    if (typingAction.errors?.length) {
-      this.log.withError(typingAction.errors).error("Error typing into search box");
-      throw new Error(typingAction.errors?.[0]?.message);
-    }
+  private async extractPosts(
+    sessionId: string,
+    windowId: string,
+    matchPrompt: string,
+    resultLimit: number,
+  ): Promise<TPost[]> {
+    this.log.info("Extracting posts...");
+    const startTime = Date.now();
 
-    const clickingAction = await this.client.windows.click(sessionId, windowId, {
-      elementDescription: `"Latest" tab at the top`,
-    });
+    const extractionPrompt = trimPrompt(EXTRACT_POSTS_PROMPT, "{MATCH_PROMPT}", matchPrompt).replace(
+      "{REASULT_LIMIT}",
+      `${resultLimit}`,
+    );
 
-    if (clickingAction.errors?.length) {
-      this.log.withError(clickingAction.errors).error("Error clicking on the 'Latest' tab");
-      throw new Error(clickingAction.errors?.[0]?.message);
-    }
-
-    // const posts = await this.retrievePosts({ sessionContext, matchPrompt });
-
-    this.log.info("Extracting posts, this might take a few minutes...");
-    const extractionPrompt = this.refineMatchPrompt(matchPrompt);
     const pageResponse = await this.client.windows.pageQuery(sessionId, windowId, {
       prompt: extractionPrompt,
       followPaginationLinks: true,
@@ -180,138 +161,81 @@ export class XInteractionService {
       },
     });
 
-    // if (pageResponse.errors?.length) {
-    //   this.log.withError(pageResponse.errors).error("Error extracting posts");
-    //   throw new Error(pageResponse.errors?.[0]?.message);
-    // }
+    const duration = (Date.now() - startTime) / 1000;
+    this.log.info("Extraction completed in:", chalk.yellow(`${duration}s`));
 
-    // this.log.withMetadata({ data: pageResponse.data }).info("<-- Model response");
     const parsedResponse = JSON.parse(pageResponse.data.modelResponse || "{}") as TExtractedPostResult;
-    return parsedResponse.postList.filter((post) => post.isCandidate);
+    return parsedResponse.postList;
   }
 
-  // async retrievePosts({
-  //   sessionContext,
-  //   matchPrompt,
-  // }: { sessionContext: SessionContext; matchPrompt: string }): Promise<TPost[]> {
-  //   const { session, windowInfo } = sessionContext;
-  //   const extractionPrompt = this.refineMatchPrompt(matchPrompt);
-  //   const postLimit = 1;
-  //   const posts: TPost[] = [];
-
-  //   const extractPosts = async () => {
-  //     this.log.info("Extracting posts...");
-  //     const pageResponse = await this.client.windows.pageQuery(session.id, windowInfo.targetId, {
-  //       prompt: extractionPrompt,
-  //       configuration: {
-  //         outputSchema: EXTRACTED_POST_OUTPUT_SCHEMA,
-  //       },
-  //     });
-
-  //     const parsedResponse = JSON.parse(pageResponse.data.modelResponse || "{}");
-  //     return parsedResponse?.postList || [];
-  //   };
-
-  //   // const almostScroll = async () => {
-  //   //   this.log.info("Scrolling to bottom of page...");
-  //   //   await this.client.windows.hover(session.id, windowInfo.targetId, {
-  //   //     elementDescription: "Scroll down the page and hover over the last post",
-  //   //   });
-  //   // };
-
-  //   while (posts.length < postLimit) {
-  //     // Give some time for the page to load results
-  //     await sleep(2000);
-  //     const newPosts = await extractPosts();
-  //     posts.push(...newPosts);
-  //     await this.scrollToBottom({ cdpWsUrl: session.cdpWsUrl || "", targetId: windowInfo.targetId });
-  //   }
-
-  //   return posts;
-  // }
-
-  // async scrollToBottom({ cdpWsUrl, targetId }: { cdpWsUrl: string; targetId: string }): Promise<void> {
-  //   // this.log.info(chalk.gray("Connecting puppeteer with the session"));
-
-  //   const puppeteerBrowser = await puppeteer.connect({
-  //     browserWSEndpoint: cdpWsUrl,
-  //     headers: {
-  //       authorization: `Bearer ${this.apiKey}`,
-  //     },
-  //   });
-
-  //   // Iterate through the pages to find the one that matches the target ID
-  //   const pages = await puppeteerBrowser.pages();
-  //   let matchingPage;
-  //   for (const page of pages) {
-  //     const pageTargetId = await (page.mainFrame() as any)._id;
-  //     if (pageTargetId === targetId) {
-  //       matchingPage = page;
-  //       break;
-  //     }
-  //   }
-
-  //   if (!matchingPage) {
-  //     throw new Error("Unable to find page");
-  //   }
-
-  //   this.log.info(chalk.gray("Scrolling to end of page"));
-  //   // await matchingPage.setViewport({
-  //   //   width: SCREEN_RESOLUTION.width,
-  //   //   height: SCREEN_RESOLUTION.height,
-  //   // });
-
-  //   await matchingPage.evaluate(() => {
-  //     window.scrollTo(0, document.body.scrollHeight);
-  //   });
-  // }
-
-  // reply to a post
-  async replyInThread({
-    sessionContext,
-    postId,
+  async generateReply({
+    sessionId,
+    windowId,
+    postLink,
     replyPrompt,
-  }: { sessionContext: SessionContext; postId: string; replyPrompt: string }): Promise<AiPromptResponse> {
-    this.log.info(`Visiting post: ${postId}`);
-    await this.client.windows.loadUrl(sessionContext.session.id, sessionContext.windowInfo.windowId, { url: postId });
+  }: GenerateReplyParams): Promise<TGeneratedReplyResult> {
+    await this.navigateToPost(sessionId, windowId, postLink);
+    return this.generateReplyContent(sessionId, windowId, replyPrompt);
+  }
+
+  private async navigateToPost(sessionId: string, windowId: string, postLink: string): Promise<void> {
+    this.log.info(`Visiting post: ${postLink}`);
+    await this.client.windows.loadUrl(sessionId, windowId, { url: postLink });
     await sleep(2000);
+  }
 
-    // Generate reply
-    const generateReplyPrompt = GENERATE_REPLY_PROMPT.replace("{CRITERIA_PROMPT}", replyPrompt);
-    const pageResponse = await this.client.windows.pageQuery(
-      sessionContext.session.id,
-      sessionContext.windowInfo.windowId,
-      {
-        prompt: generateReplyPrompt,
-        configuration: {
-          outputSchema: GENERATED_REPLY_OUTPUT_SCHEMA,
-        },
+  private async generateReplyContent(
+    sessionId: string,
+    windowId: string,
+    replyPrompt: string,
+  ): Promise<TGeneratedReplyResult> {
+    const generateReplyPrompt = trimPrompt(GENERATE_REPLY_PROMPT, "{CRITERIA_PROMPT}", replyPrompt);
+    const pageResponse = await this.client.windows.pageQuery(sessionId, windowId, {
+      prompt: generateReplyPrompt,
+      configuration: {
+        outputSchema: GENERATED_REPLY_OUTPUT_SCHEMA,
       },
-    );
-
-    if (pageResponse.errors?.length) {
-      this.log.withError(pageResponse.errors).error("Error generating reply");
-      throw new Error(pageResponse.errors?.[0]?.message);
-    }
-
-    const parsedResponse = JSON.parse(pageResponse.data.modelResponse || "{}") as TGeneratedReplyResult;
-    this.log.info(`Generated reply: ${parsedResponse.reply}`);
-
-    // type the reply
-    const results = await this.client.windows.type(sessionContext.session.id, sessionContext.windowInfo.windowId, {
-      elementDescription: `On the comment box with the text "Post your reply"`,
-      text: parsedResponse.reply,
-      pressEnterKey: false,
     });
 
-    this.log.withMetadata({ results }).info("Reply results");
-    return results;
+    this.handleErrors(pageResponse.errors, "Error generating reply");
+
+    return JSON.parse(pageResponse.data.modelResponse || "{}") as TGeneratedReplyResult;
   }
 
-  refineMatchPrompt(matchPrompt: string): string {
-    return EXTRACT_POSTS_PROMPT.replace(/[\t]/g, "")
-      .replace("{REASULT_LIMIT}", RESULT_LIMIT.toString())
-      .replace("{MATCH_PROMPT}", matchPrompt)
-      .trim();
+  async sendReply({ sessionId, windowId, reply }: SendReplyParams): Promise<void> {
+    const typeResult = await this.typeReply(sessionId, windowId, reply);
+    this.handleErrors(typeResult.errors, "Error typing reply");
+
+    await sleep(3000);
+
+    const clickResult = await this.clickReplyButton(sessionId, windowId);
+    this.handleErrors(clickResult.errors, "Error clicking reply button");
+  }
+
+  private async typeReply(sessionId: string, windowId: string, reply: string) {
+    return this.client.windows.type(sessionId, windowId, {
+      elementDescription: `On the comment box with the text "Post your reply"`,
+      text: reply,
+      pressEnterKey: false,
+    });
+  }
+
+  private async clickReplyButton(sessionId: string, windowId: string) {
+    return this.client.windows.click(sessionId, windowId, {
+      elementDescription: `"Reply" button`,
+      configuration: { visualAnalysis: { scope: "viewport" } },
+    });
+  }
+
+  private handleErrors(errors: any[] | undefined, message: string): void {
+    if (errors?.length) {
+      this.log.withError(errors).error(message);
+      throw new Error(errors[0]?.message || message);
+    }
+  }
+
+  async terminateSession(sessionId: string): Promise<void> {
+    await this.client.sessions.terminate(sessionId);
+    this.log.info(chalk.yellow("Session terminated"));
   }
 }

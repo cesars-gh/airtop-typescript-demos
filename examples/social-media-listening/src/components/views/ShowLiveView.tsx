@@ -1,5 +1,6 @@
+import { InProgressForm } from "@/components/forms/InProgressForm";
+import { TerminateSession } from "@/components/ui/TerminateSession";
 import { Card, CardContent, CardHeader, CardTitle, LiveView } from "@local/ui";
-import { ProcessInteractionsForm } from "../forms/ProcessInteractionsForm";
 
 interface ShowLiveViewProps {
   liveViewUrl: string;
@@ -8,17 +9,16 @@ interface ShowLiveViewProps {
 export function ShowLiveView({ liveViewUrl }: ShowLiveViewProps) {
   return (
     <Card>
-      <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-        <CardTitle className="text-sm font-medium">Live View</CardTitle>
+      <CardHeader className="flex flex-row items-center justify-between">
+        <CardTitle className="text-lg font-semibold">Live View</CardTitle>
+        <TerminateSession />
       </CardHeader>
-      <CardContent>
-        <div className="flex flex-col">
-          <div className="flex">
-            <LiveView liveViewUrl={liveViewUrl} />
-          </div>
-          <div className="flex mt-4">
-            <ProcessInteractionsForm />
-          </div>
+      <CardContent className="flex justify-between">
+        <div className="w-[80%] overflow-x-scroll">
+          <LiveView className="w-[1920px]" liveViewUrl={liveViewUrl} height="900px" />
+        </div>
+        <div className="w-[20%]">
+          <InProgressForm />
         </div>
       </CardContent>
     </Card>

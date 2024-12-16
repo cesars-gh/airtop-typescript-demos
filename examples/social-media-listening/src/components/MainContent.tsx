@@ -1,6 +1,7 @@
 "use client";
-import { DisplayPromptResponse } from "@/components/views/DisplayPromptResponse";
+
 import { InitializeView } from "@/components/views/InitializeView";
+import { ResultsView } from "@/components/views/ResultsView";
 import { ShowLiveView } from "@/components/views/ShowLiveView";
 import { useAppStore } from "@/store";
 import { ApiKeyRequired, useTerminateSession } from "@local/ui";
@@ -14,7 +15,9 @@ export function MainContent({ currentApiKey }: MainContentProps) {
   // Get API key and response from global state
   const setApiKey = useAppStore((state) => state.setApiKey);
   const apiKey = useAppStore((state) => state.apiKey);
-  const apiResponse = useAppStore((state) => state.response);
+  const appStatus = useAppStore((state) => state.status);
+  const sessionContext = useAppStore((state) => state.sessionContext);
+  const sessionId = sessionContext?.session.id;
 
   useEffect(() => {
     // Set the API key from the cookie if it's not already set
@@ -26,15 +29,14 @@ export function MainContent({ currentApiKey }: MainContentProps) {
   // Hook to handle session termination when needed
   const terminateSession = useTerminateSession({
     apiKey,
-    sessionId: apiResponse.sessionId,
+    sessionId,
   });
 
   // Effect to clean up sessions when user leaves the page
   useEffect(() => {
     const handleBeforeUnload = () => {
       // Only terminate if we have an active session (sessionId + apiKey)
-      // but no content yet (still processing)
-      if (apiResponse.sessionId && apiKey && !apiResponse.content) {
+      if (sessionId && apiKey && appStatus !== "in_progress") {
         terminateSession();
       }
     };
@@ -46,7 +48,7 @@ export function MainContent({ currentApiKey }: MainContentProps) {
     return () => {
       window.removeEventListener("beforeunload", handleBeforeUnload);
     };
-  }, [apiKey, apiResponse.sessionId, apiResponse.content, terminateSession]);
+  }, [apiKey, sessionId, appStatus, terminateSession]);
 
   if (!apiKey) {
     return <ApiKeyRequired />;
@@ -55,13 +57,13 @@ export function MainContent({ currentApiKey }: MainContentProps) {
   // Conditional rendering based on application state:
 
   // 1. Show Live View as soon as we have a live view URL
-  if (!apiResponse.content && apiResponse?.liveViewUrl) {
-    return <ShowLiveView liveViewUrl={apiResponse.liveViewUrl} />;
+  if (appStatus === "in_progress" && sessionContext?.windowInfo.liveViewUrl) {
+    return <ShowLiveView liveViewUrl={sessionContext.windowInfo.liveViewUrl} />;
   }
 
-  // 2. Show results if we have content
-  if (apiResponse.content) {
-    return <DisplayPromptResponse content={apiResponse.content} />;
+  // 2. Show results if the task is completed
+  if (appStatus === "completed") {
+    return <ResultsView />;
   }
 
   // 3. Default view - show initialization screen
