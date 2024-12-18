@@ -3,7 +3,7 @@ import { NextResponse } from "next/server";
 import { searchPostsController } from "./search.controller";
 import { type SearchPostsRequest, type SearchPostsResponse, searchPostsSchema } from "./search.validation";
 
-export const maxDuration = 300;
+export const maxDuration = 60;
 
 /**
  * Searches for posts in X.

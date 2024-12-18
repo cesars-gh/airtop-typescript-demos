@@ -3,7 +3,7 @@ import { type NextRequest, NextResponse } from "next/server";
 import { loginController } from "./login.controller";
 import { type CheckLoginRequest, type CheckLoginResponse, checkLoginRequestSchema } from "./login.validation";
 
-export const maxDuration = 300;
+export const maxDuration = 60;
 
 /**
  * Checks if the user is logged in to X.

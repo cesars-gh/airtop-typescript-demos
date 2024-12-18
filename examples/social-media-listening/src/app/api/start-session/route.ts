@@ -7,7 +7,7 @@ import {
 import { getLogger, serializeErrors } from "@local/utils";
 import { type NextRequest, NextResponse } from "next/server";
 
-export const maxDuration = 300;
+export const maxDuration = 60;
 
 /**
  * Initializes the Airtop session and start the process of interacting with the browser.

@@ -3,7 +3,7 @@ import { NextResponse } from "next/server";
 import { sendReplyController } from "./send-reply.controller";
 import { type SendReplyRequest, type SendReplyResponse, sendReplySchema } from "./send-reply.validation";
 
-export const maxDuration = 300;
+export const maxDuration = 60;
 
 /**
  * Posts the generated reply to thread in X.
