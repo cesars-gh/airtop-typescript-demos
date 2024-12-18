@@ -3,7 +3,7 @@ import { type FulfillRequest, type FulfillResponse, fulfillRequestSchema } from 
 import { getLogger } from "@local/utils";
 import { type NextRequest, NextResponse } from "next/server";
 
-export const maxDuration = 300;
+export const maxDuration = 60;
 
 /**
  * Continues with the task after the user has completed sign-in.

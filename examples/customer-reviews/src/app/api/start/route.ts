@@ -3,7 +3,7 @@ import { type StartRequest, type StartResponse, startRequestSchema } from "@/app
 import { getLogger, serializeErrors } from "@local/utils";
 import { type NextRequest, NextResponse } from "next/server";
 
-export const maxDuration = 300;
+export const maxDuration = 60;
 
 /**
  * Initializes the Airtop session and start the process of replying to customer reviews.

@@ -7,7 +7,7 @@ import {
   processInteractionsRequestSchema,
 } from "./process-interactions.validation";
 
-export const maxDuration = 300;
+export const maxDuration = 60;
 
 /**
  * Initializes the Airtop session and start the process of interacting with the browser.

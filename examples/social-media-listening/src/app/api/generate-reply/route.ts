@@ -7,7 +7,7 @@ import {
   generateReplySchema,
 } from "./generate-reply.validation";
 
-export const maxDuration = 300;
+export const maxDuration = 60;
 
 /**
  * Generates a reply to the given post.
